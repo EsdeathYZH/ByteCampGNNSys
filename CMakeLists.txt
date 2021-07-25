@@ -32,7 +32,10 @@ if (BUILD_TEST)
     set(install_gmock OFF)
     set(build_gmock ON)
 
+    set(GTEST_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest)
     add_subdirectory("third_party/googletest")
+    set(GTEST_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googletest/include"
+            "${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googlemock/include")
 
     function(bytegraph_test test_file)
         get_filename_component(test_target_name "${test_file}" NAME_WE)
