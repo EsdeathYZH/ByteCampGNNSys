@@ -1,6 +1,15 @@
-#include <iostream>
+#include "glog/logging.h"
 
-int main() {
-    std::cout << "hello client\n";
+int main(int argc, char **argv) {
+  // Initialize Google’s logging library.
+  google::InitGoogleLogging(argv[0]);
+  FLAGS_logtostderr = 1;
+
+  // ...
+  LOG(INFO) << "Found " << 1 << " cookies";
+  FLAGS_logtostderr = 0;
+  LOG(INFO) << "Found " << 2 << " cookies";
+  FLAGS_logtostderr = 1;
+  LOG(INFO) << "Found " << 3 << " cookies";
     return 0;
 }

@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 project(ByteGraph)
 
 add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1 -fno-omit-frame-pointer)
+option(BUILD_TEST "build test" ON)
+option(DEBUG_MODE "debug mode" ON)
 
 if (DEBUG_MODE)
     add_compile_options(-g)
@@ -16,6 +18,8 @@ include_directories("${PROJECT_SOURCE_DIR}/src")
 add_executable(GraphClient
     "${PROJECT_SOURCE_DIR}/src/client/client.cpp"
 )
+target_link_libraries(GraphClient
+        PRIVATE glog::glog)
 
 add_executable(GraphServer
     "${PROJECT_SOURCE_DIR}/src/server/worker.cpp"
@@ -45,4 +49,6 @@ if (BUILD_TEST)
 
     bytegraph_test("src/client/sample_test.cc")
 endif(BUILD_TEST)
+
+add_subdirectory(third_party/glog)
 
