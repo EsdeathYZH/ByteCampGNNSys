@@ -36,8 +36,6 @@ if (BUILD_TEST)
     add_subdirectory("third_party/googletest")
     set(GTEST_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googletest/include"
             "${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googlemock/include")
-    set(GTEST_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/lib/libgtest.a")
-    set(GTEST_MAIN_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/lib/libgtest_main.a ")
 
     function(bytegraph_test test_file)
         get_filename_component(test_target_name "${test_file}" NAME_WE)

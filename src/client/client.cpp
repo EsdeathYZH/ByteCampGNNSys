@@ -3,6 +3,8 @@
 int main(int argc, char **argv) {
   // Initialize Google’s logging library.
   google::InitGoogleLogging(argv[0]);
+  google::SetLogDestination(google::INFO, "/tmp/log/INFO_");
+//  google::SetStderrLogging(google::INFO);
   FLAGS_logtostderr = 1;
 
   // ...
