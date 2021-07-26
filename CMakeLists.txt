@@ -1,9 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
 project(ByteGraph)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_C_STANDARD 11)
 add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1 -fno-omit-frame-pointer)
+add_definitions(-std=c++11)
 option(BUILD_TEST "build test" ON)
 option(DEBUG_MODE "debug mode" ON)
+
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH}) # To allow CMake to locate our Find*.cmake files
 
 if (DEBUG_MODE)
     add_compile_options(-g)
@@ -13,16 +18,62 @@ else ()
     message(STATUS "release mode")
 endif ()
 
+find_package(Threads REQUIRED)
+
+find_package(Thrift REQUIRED)
+include_directories(${THRIFT_INCLUDE_DIR})
+
+find_package(LibEvent REQUIRED)
+include_directories(${LIBEVENT_INCLUDE_DIR})
+
+message("use Thrift NonblockingServer")
+set(NONBLOCKING_LIBS
+    ${THRIFT_NB_LIBRARIES}
+    ${LIBEVENT_LIBRARIES}
+)
+
+set(CLIENT_SRC
+    src/client/client.h
+    src/client/client.cpp
+    src/utils/random.h
+    gen-cpp/ByteGraph_types.h
+    gen-cpp/GraphServices.h
+    gen-cpp/GraphServices.cpp
+)
+
+set(SERVER_SRC
+    src/server/worker.h
+    src/server/worker.cpp
+    src/graph/graph_loader.h
+    src/graph/graph.h
+    src/utils/random.h
+    src/engine/sampling_engine.h
+    gen-cpp/ByteGraph_types.h
+    gen-cpp/GraphServices.h
+    gen-cpp/GraphServices.cpp
+)
+
 include_directories("${PROJECT_SOURCE_DIR}/src")
+# include_directories("${PROJECT_SOURCE_DIR}/gen-cpp")
 
 add_executable(GraphClient
-    "${PROJECT_SOURCE_DIR}/src/client/client.cpp"
+    # "${PROJECT_SOURCE_DIR}/src/client/client.cpp"
+    ${CLIENT_SRC}
 )
 target_link_libraries(GraphClient
-        PRIVATE glog::glog)
+    PRIVATE glog::glog
+    ${THRIFT_LIBRARIES}
+    ${NONBLOCKING_LIBS}
+)
 
 add_executable(GraphServer
-    "${PROJECT_SOURCE_DIR}/src/server/worker.cpp"
+    # "${PROJECT_SOURCE_DIR}/src/server/worker.cpp"
+    ${SERVER_SRC}
+)
+
+target_link_libraries(GraphServer
+    ${THRIFT_LIBRARIES}
+    ${NONBLOCKING_LIBS}
 )
 
 if (BUILD_TEST)
