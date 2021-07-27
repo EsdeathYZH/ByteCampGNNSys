@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include "../gen-cpp/GraphServices.h"
+#include "gen-cpp/GraphServices.h"
 #include "glog/logging.h"
 
 using std::string;
