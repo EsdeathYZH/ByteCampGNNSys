@@ -26,6 +26,12 @@ int main(int argc, char **argv) {
 
     client_->sayHello(ret, 1234, "thrift_test");
     LOG(INFO) << ret;
+    NodeFeature r;
+    client_->GetNodeFeature(r, 14, 22);
+    LOG(INFO) << "GetNodeFeature";
+    for (auto i : r) {
+        LOG(INFO) << i;
+    }
 
     return 0;
 }
