@@ -5,7 +5,7 @@
 #include <thrift/transport/TNonblockingServerSocket.h>
 #include <thrift/transport/TServerSocket.h>
 
-#include "../gen-cpp/GraphServices.h"
+#include "gen-cpp/GraphServices.h"
 using std::string;
 
 namespace at = ::apache::thrift;
