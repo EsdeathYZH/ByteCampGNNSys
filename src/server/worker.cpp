@@ -36,14 +36,20 @@ void GraphServicesHandler::SampleBatchNodes(BatchNodes& _return, const NodeType 
     printf("[Server printf] SampleBatchNodes\n");
 }
 
-void GraphServicesHandler::GetNodeFeature(NodeFeature& _return, const NodeId node_id, const FeatureId feature_id) {
+void GraphServicesHandler::GetNodeFeature(NodeFeature& _return, const NodeId node_id,
+                                          const std::vector<FeatureType>& feature_id) {
     // Your implementation goes here
     printf("[Server printf] GetNodeFeature\n");
-    _return = {(int32_t) node_id, (int32_t) feature_id};
+    _return = {(int32_t) node_id, (int32_t) feature_id[0]};
+}
+
+void GraphServicesHandler::GetNodeNeighbors(Neighbor& _return, const NodeId node_id, const EdgeType edge_type) {
+    // Your implementation goes here
+    printf("[Server printf] GetNodeNeighbors\n");
 }
 
 void GraphServicesHandler::GetNeighborsWithFeature(std::vector<IDFeaturePair>& _return, const NodeId node_id,
-                                                   const NodeType neighbor_type,
+                                                   const EdgeType neighbor_type,
                                                    const std::vector<FeatureType>& feature_types) {
     // Your implementation goes here
     printf("[Server printf] GetNeighborsWithFeature\n");

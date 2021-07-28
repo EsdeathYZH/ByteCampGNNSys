@@ -25,10 +25,12 @@ class GraphServicesHandler : virtual public GraphServicesIf {
     void SampleBatchNodes(BatchNodes& _return, const NodeType type, const int32_t batch_size,
                           const SampleStrategy::type strategy);
 
-    void GetNodeFeature(NodeFeature& _return, const NodeId node_id, const FeatureId feature_id);
+    void GetNodeFeature(NodeFeature& _return, const NodeId node_id, const std::vector<FeatureType>& feature_id);
+
+    void GetNodeNeighbors(Neighbor& _return, const NodeId node_id, const EdgeType edge_type);
 
     void GetNeighborsWithFeature(std::vector<IDFeaturePair>& _return, const NodeId node_id,
-                                 const NodeType neighbor_type, const std::vector<FeatureType>& feature_types);
+                                 const EdgeType neighbor_type, const std::vector<FeatureType>& feature_types);
 
     void SampleNeighbor(std::vector<IDNeighborPair>& _return, const int32_t batch_size, const NodeType node_type,
                         const NodeType neighbor_type, const int32_t sample_num);
