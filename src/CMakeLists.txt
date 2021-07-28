@@ -1,5 +1,6 @@
 set(THRIFT_SRC
         gen-cpp/ByteGraph_types.h
+        gen-cpp/ByteGraph_types.cpp
         gen-cpp/GraphServices.h
         gen-cpp/GraphServices.cpp
         )
