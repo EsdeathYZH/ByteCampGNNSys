@@ -8,13 +8,9 @@
 #include "gen-cpp/GraphServices.h"
 #include "engine/graph_engine.h"
 
-using std::string;
-
 namespace at = ::apache::thrift;
 namespace atp = ::apache::thrift::protocol;
 namespace att = ::apache::thrift::transport;
-
-using namespace ::ByteGraph;
 
 class GraphServicesHandler : virtual public GraphServicesIf {
    public:
@@ -22,22 +18,35 @@ class GraphServicesHandler : virtual public GraphServicesIf {
 
     void sayHello(std::string& _return, const int32_t workerId, const std::string& content);
 
-    void getFullGraphInfo(GraphInfo& _return);
+    void getFullGraphInfo(ByteGraph::GraphInfo& _return);
 
-    void SampleBatchNodes(BatchNodes& _return, const NodeType type, const int32_t batch_size,
-                          const SampleStrategy::type strategy);
+    void SampleBatchNodes(ByteGraph::BatchNodes& _return, 
+                          const ByteGraph::NodeType type, 
+                          const int32_t batch_size,
+                          const ByteGraph::SampleStrategy::type strategy);
 
-    void GetNodeFeature(NodeFeature& _return, const NodeId node_id, const std::vector<FeatureType>& feature_id);
+    void GetNodeFeature(ByteGraph::NodeFeature& _return, 
+                        const ByteGraph::NodeId node_id, 
+                        const ByteGraph::FeatureType feat_type);
 
-    void GetNodeNeighbors(Neighbor& _return, const NodeId node_id, const EdgeType edge_type);
+    void GetNodeNeighbors(ByteGraph::Neighbor& _return, 
+                          const ByteGraph::NodeId node_id, 
+                          const ByteGraph::EdgeType edge_type);
 
-    void GetNeighborsWithFeature(std::vector<IDFeaturePair>& _return, const NodeId node_id,
-                                 const EdgeType neighbor_type, const std::vector<FeatureType>& feature_types);
+    void GetNeighborsWithFeature(std::vector<IDFeaturePair>& _return, 
+                                 const ByteGraph::NodeId node_id,
+                                 const ByteGraph::EdgeType edge_type, 
+                                 const ByteGraph::FeatureType feat_type);
 
-    void SampleNeighbor(std::vector<IDNeighborPair>& _return, const int32_t batch_size, const NodeType node_type,
-                        const NodeType neighbor_type, const int32_t sample_num);
+    void SampleNeighbor(std::vector<ByteGraph::IDNeighborPair>& _return, 
+                        const int32_t batch_size, 
+                        const ByteGraph::NodeType node_type,
+                        const ByteGraph::EdgeType edge_type, 
+                        const int32_t sample_num);
 
-    void RandomWalk(std::vector<NodeId>& _return, const int32_t batch_size, const int32_t walk_len);
+    void RandomWalk(std::vector<ByteGraph::NodeId>& _return,
+                    const int32_t batch_size,
+                    const int32_t walk_len);
 
    private:
     std::shared_ptr<Byte::GraphEngine> engine_;

@@ -8,16 +8,24 @@ GraphInfo GraphEngine::getGraphInfo() {
 
 std::vector<NodeID> GraphEngine::sampleNodesFromRandom(NodeType node_type, int batch_size) {
     std::vector<NodeID> mini_batch;
+    mini_batch.reserve(batch_size);
     NodeList nodes = graph_->getNodes(node_type);
-    // TODO: Sampling logic
+    for(int i = 0; i < batch_size; i++) {
+        uint32_t idx = uint32_t(ThreadLocalRandom() * nodes.sz);
+        mini_batch.push_back(nodes.data[idx]);
+    }
     return mini_batch;
 }
 
 std::vector<NodeID> GraphEngine::sampleNodesFromWeight(NodeType node_type, int batch_size) {
     std::vector<NodeID> mini_batch;
+    mini_batch.reserve(batch_size);
     NodeList nodes = graph_->getNodes(node_type);
     WeightList weights = graph_->getNodeWeights(node_type, 0, 0); // FIXME: hard code
-    // TODO: Samping Logic
+    ITSSampling its_table(weights);
+    for(int i = 0; i < batch_size; i++) {
+        mini_batch.push_back(its_table.sample());
+    }
     return mini_batch;
 }
 

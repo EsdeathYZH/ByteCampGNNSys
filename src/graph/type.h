@@ -5,7 +5,7 @@
 
 namespace Byte {
 
-using NodeID = uint32_t;
+using NodeID = uint64_t;
 using NodeType = uint32_t;
 using EdgeType = uint32_t;
 using FeatureType = uint32_t;
@@ -13,7 +13,10 @@ using FeatureData = float; // TODO: find a solution to use half-precision float 
 
 enum class FeatureStorageType { ROW_STORE, COL_STORE };
 
-using NodeList = std::pair<NodeID*, size_t>;
+struct NodeList {
+    NodeID* data;
+    size_t sz;
+};
 
 struct Feature {
     FeatureData* data;
