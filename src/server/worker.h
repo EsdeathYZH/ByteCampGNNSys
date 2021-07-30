@@ -6,6 +6,8 @@
 #include <thrift/transport/TServerSocket.h>
 
 #include "gen-cpp/GraphServices.h"
+#include "engine/graph_engine.h"
+
 using std::string;
 
 namespace at = ::apache::thrift;
@@ -16,7 +18,7 @@ using namespace ::ByteGraph;
 
 class GraphServicesHandler : virtual public GraphServicesIf {
    public:
-    GraphServicesHandler();
+    GraphServicesHandler(std::shared_ptr<Byte::GraphEngine> engine);
 
     void sayHello(std::string& _return, const int32_t workerId, const std::string& content);
 
@@ -36,4 +38,7 @@ class GraphServicesHandler : virtual public GraphServicesIf {
                         const NodeType neighbor_type, const int32_t sample_num);
 
     void RandomWalk(std::vector<NodeId>& _return, const int32_t batch_size, const int32_t walk_len);
+
+   private:
+    std::shared_ptr<Byte::GraphEngine> engine_;
 };

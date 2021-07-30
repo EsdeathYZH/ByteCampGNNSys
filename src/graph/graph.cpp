@@ -1,6 +1,11 @@
+#include <fstream>
 #include "graph/graph.h"
 
 namespace Byte {
+Graph::Graph(int partition_id, std::string data_dir) 
+    : partition_id(partition_id) {
+    load(data_dir);
+}
 
 NodeList Graph::getNeighbors(NodeID node_id, EdgeType edge_type) {
     NeighborList neigh_list = edge_map_[edge_type][node_id];
@@ -51,6 +56,73 @@ WeightList Graph::getNodeWeights(NodeType node_type, FeatureType feat_type, uint
         result.stride = feat_dim;
     }
     return result;
+}
+
+void Graph::load(std::string data_dir) {
+    // init metadata
+
+    // load data
+    std::string path = data_dir + "/" + std::to_string(partition_id);
+    load_paper2paper_edges(path);
+    load_author2paper_edges(path);
+    load_author2institution_edges(path);
+    load_paper_label(path + "/paper_label.txt");
+    load_paper_feature(path + "/paper_feature.txt");
+}
+
+void Graph::load_paper2paper_edges(std::string file_path) {
+    load_edges(4, file_path + "/paper2paper_edge_table.txt");
+}
+
+void Graph::load_author2paper_edges(std::string file_path) {
+    load_edges(5, file_path + "/author2paper_edge_table.txt");
+}
+
+void Graph::load_author2institution_edges(std::string file_path) {
+    load_edges(6, file_path + "/author2institution_edge_table.txt");
+}
+
+void Graph::load_edges(EdgeType edge_type, std::string file_path) {
+    EdgeTypeMeta edge_meta = edge_type_meta_[edge_type];
+    NodeTypeMeta src_meta = edge_type_meta_[edge_meta.src_type];
+    edge_map_[edge_type] = std::unordered_map<NodeID, NeighborList>();
+    edge_map_[edge_type].reserve(src_meta.local_num);
+    edge_data_[edge_type] = std::vector<NodeID>();
+    edge_data_[edge_type].reserve(edge_meta.local_num);
+
+    std::ifstream edge_file(file_path);
+    NodeID src_id, dst_id, cur_id = 0;
+    size_t prev_idx = 0, cur_idx = 0;
+    // we assume edges have been sorted by source id
+    while(edge_file >> src_id >> dst_id) {
+        // new src
+        if(src_id != cur_id) {
+            NeighborList neigh_list;
+            neigh_list.index = prev_idx;
+            neigh_list.sz = cur_idx - prev_idx;
+            edge_map_[edge_type][cur_id] = neigh_list;
+            prev_idx = cur_idx;
+            cur_id = src_id;
+        }
+        edge_data_[edge_type].push_back(dst_id);
+        cur_idx++;
+    }
+    return;
+}
+
+void Graph::load_paper_feature(std::string file_path) {
+
+}
+
+void Graph::load_paper_label(std::string file_path) {
+    label_map_.reserve(1398159); // FIXME: remove hardcode
+    std::ifstream label_file(file_path);
+    NodeID paper_id;
+    uint32_t paper_label;
+    while(label_file >> paper_id >> paper_label) {
+        label_map_[paper_id] = paper_label;
+    }
+    return;
 }
 
 }

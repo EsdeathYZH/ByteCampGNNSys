@@ -6,8 +6,9 @@
 namespace Byte {
 
 class Graph {
-    friend class DataSet;
 public:
+    explicit Graph(int partition_id, std::string data_dir);
+
     // meta data getter
     GraphMeta getGraphMeta() { return graph_meta_; }
     NodeTypeMeta getNodeTypeMeta(NodeType node_type) { return node_type_meta_[node_type]; }
@@ -22,6 +23,10 @@ public:
     WeightList getNodeWeights(NodeType node_type, FeatureType feat_type, uint32_t idx);
 
 private:
+    int partition_id;
+    int paper_feat_dim = 768;
+    int num_classes = 153;
+
     // meta data
     GraphMeta graph_meta_;
     std::map<NodeType, NodeTypeMeta> node_type_meta_;
@@ -36,9 +41,22 @@ private:
     std::unordered_map<FeatureType, std::unordered_map<NodeID, uint32_t>> feature_map_;
     std::unordered_map<FeatureType, std::vector<FeatureData>> feature_data_;
 
+    // label data
+    std::unordered_map<NodeID, uint32_t> label_map_;
+
     // edge data
     std::unordered_map<EdgeType, std::unordered_map<NodeID, NeighborList>> edge_map_;
     std::unordered_map<EdgeType, std::vector<NodeID>> edge_data_;
+
+    // data loading
+    void load(std::string data_dir);
+    void load_edges(EdgeType edge_type, std::string file_path);
+    void load_paper2paper_edges(std::string file_path);
+    void load_author2paper_edges(std::string file_path);
+    void load_author2institution_edges(std::string file_path);
+
+    void load_paper_feature(std::string file_path);
+    void load_paper_label(std::string file_path);
 };
 
 }

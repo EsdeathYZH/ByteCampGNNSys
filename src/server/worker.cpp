@@ -5,7 +5,9 @@
 int main(int argc, char** argv) {
     std::cout << "[Server cout] hello worker\n";
     int port = 9090;
-    ::std::shared_ptr<GraphServicesHandler> handler(new GraphServicesHandler());
+    ::std::shared_ptr<Byte::Graph> graph = std::make_shared<Byte::Graph>("/dataset");
+    ::std::shared_ptr<Byte::GraphEngine> engine(new Byte::GraphEngine(graph));
+    ::std::shared_ptr<GraphServicesHandler> handler(new GraphServicesHandler(engine));
     ::std::shared_ptr<at::server::TProcessor> processor(new GraphServicesProcessor(handler));
 
     ::std::shared_ptr<att::TNonblockingServerSocket> serverTransport(new att::TNonblockingServerSocket(port));
@@ -16,7 +18,8 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-GraphServicesHandler::GraphServicesHandler() = default;
+GraphServicesHandler::GraphServicesHandler(std::shared_ptr<Byte::GraphEngine> engine)
+    : engine_(engine) {}
 
 void GraphServicesHandler::sayHello(std::string& _return, const int32_t workerId, const std::string& content) {
     // Your implementation goes here
@@ -28,6 +31,17 @@ void GraphServicesHandler::sayHello(std::string& _return, const int32_t workerId
 void GraphServicesHandler::getFullGraphInfo(GraphInfo& _return) {
     // Your implementation goes here
     printf("[Server printf] getFullGraphInfo\n");
+    Byte::GraphMeta meta = engine_->getGraphInfo();
+    uint32_t num_papers;
+    uint32_t num_authors;
+    uint32_t num_institutions;
+    uint32_t paper_feat_dim;
+    uint32_t num_classes;
+    _return.infos_.push_back(meta.num_papers);
+    _return.infos_.push_back(meta.num_authors);
+    _return.infos_.push_back(meta.num_institutions);
+    _return.infos_.push_back(meta.num_papers);
+    _return.infos_.push_back(meta.num_papers);
 }
 
 void GraphServicesHandler::SampleBatchNodes(BatchNodes& _return, const NodeType type, const int32_t batch_size,

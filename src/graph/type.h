@@ -42,13 +42,15 @@ struct GraphMeta {
 };
 
 struct NodeTypeMeta {
-    uint32_t local_id_num;
-    uint32_t global_id_num;
+    uint32_t local_num;
+    uint32_t global_num;
 
     uint32_t dense_id_index;
 };
 
 struct EdgeTypeMeta {
+    uint32_t local_num;
+    uint32_t global_num;
     NodeType src_type;
     NodeType dst_type;
 };
