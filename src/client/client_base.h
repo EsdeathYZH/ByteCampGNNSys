@@ -32,6 +32,6 @@ class ClientBase {
                             std::vector<ByteGraph::NodeId>& nodes) = 0;
 };
 
-} // namespace ByteCamp
+}  // namespace ByteCamp
 
-#endif // BYTEGRAPH_CLIENT_BASE_H_
+#endif  // BYTEGRAPH_CLIENT_BASE_H_
