@@ -21,6 +21,7 @@ ClientWithoutCache::ClientWithoutCache(std::string peerIP, int port)
     , rpc_client_(std::make_shared<ByteGraph::GraphServicesClient>(protocol_)) {
     // open connection, may throw exception.
     transport_->open();
+    LOG(INFO) << "connect to server:" << peerIP << " port:" << port;
 }
 
 void ClientWithoutCache::GetFullGraphInfo(ByteGraph::GraphInfo &graphInfo) { rpc_client_->getFullGraphInfo(graphInfo); }

@@ -14,6 +14,8 @@ set(CLIENT_SRC
         client/cache_base.h
         client/client_without_cache.h
         client/client_without_cache.cpp
+        client/client_with_cache.h
+        client/client_with_cache.cpp
         utils/random.h
         ${THRIFT_SRC}
         )
