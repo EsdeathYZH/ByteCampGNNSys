@@ -1,6 +1,9 @@
 #ifndef BYTEGRAPH_GRAPH_GRAPH_H_
 #define BYTEGRAPH_GRAPH_GRAPH_H_
 
+#include <unordered_map>
+#include <map>
+#include <vector>
 #include "graph/type.h"
 
 namespace Byte {

@@ -9,11 +9,17 @@ Graph::Graph(int partition_id, std::string data_dir)
 
 NodeList Graph::getNeighbors(NodeID node_id, EdgeType edge_type) {
     NeighborList neigh_list = edge_map_[edge_type][node_id];
-    return NodeList(&edge_data_[edge_type][neigh_list.index], neigh_list.sz);
+    NodeList node_list;
+    node_list.data = &edge_data_[edge_type][neigh_list.index];
+    node_list.sz = neigh_list.sz; 
+    return node_list;
 }
 
 NodeList Graph::getNodes(NodeType node_type) {
-    return NodeList(node_ids[node_type].data(), node_ids[node_type].size());
+    NodeList node_list;
+    node_list.data = node_ids[node_type].data();
+    node_list.sz = node_ids[node_type].size();
+    return node_list;
 }
 
 Feature Graph::getFeatureData(NodeID node_id, FeatureType feat_type) {
@@ -23,11 +29,11 @@ Feature Graph::getFeatureData(NodeID node_id, FeatureType feat_type) {
     uint32_t feat_num = feature_data_[feat_type].size() / feat_dim;
     uint32_t index = feature_map_[feat_type][node_id];
     if(feat_store_type == FeatureStorageType::COL_STORE) {
-        result.data = feature_data_[feat_type][index];
+        result.data = feature_data_[feat_type].data() + index;
         result.sz = feat_dim;
         result.stride = feat_num;
     } else {
-        result.data = feature_data_[feat_type][index * feat_dim];
+        result.data = feature_data_[feat_type].data() + index * feat_dim;
         result.sz = feat_dim;
         result.stride = 1;
     }
@@ -47,11 +53,11 @@ WeightList Graph::getNodeWeights(NodeType node_type, FeatureType feat_type, uint
     uint32_t feat_dim = meta.feature_dim;
     uint32_t feat_num = feature_data_[feat_type].size() / feat_dim;
     if(feat_store_type == FeatureStorageType::COL_STORE) {
-        result.data = feature_data_[feat_type][feat_num * idx];
+        result.data = feature_data_[feat_type].data() + feat_num * idx;
         result.sz = feat_num;
         result.stride = 1;
     } else {
-        result.data = feature_data_[feat_type][idx];
+        result.data = feature_data_[feat_type].data() + idx;
         result.sz = feat_num;
         result.stride = feat_dim;
     }
@@ -84,7 +90,7 @@ void Graph::load_author2institution_edges(std::string file_path) {
 
 void Graph::load_edges(EdgeType edge_type, std::string file_path) {
     EdgeTypeMeta edge_meta = edge_type_meta_[edge_type];
-    NodeTypeMeta src_meta = edge_type_meta_[edge_meta.src_type];
+    NodeTypeMeta src_meta = node_type_meta_[edge_meta.src_type];
     edge_map_[edge_type] = std::unordered_map<NodeID, NeighborList>();
     edge_map_[edge_type].reserve(src_meta.local_num);
     edge_data_[edge_type] = std::vector<NodeID>();

@@ -3,7 +3,7 @@
 #define BYTEGRAPH_ENGINE_ITS_SAMPLING_H_
 
 #include <vector>
-#include "type.h"
+#include "graph/type.h"
 #include "utils/random.h"
 
 namespace Byte {
@@ -20,11 +20,11 @@ public:
         return;
     }
 
-    size_t sample() const{
+    size_t sample() const {
         return randomSelect(0, sum_weights_.size() - 1);
     }
 
-    size_t randomSelect(size_t begin_pos, size_t end_pos) {
+    size_t randomSelect(size_t begin_pos, size_t end_pos) const {
         float limit_begin = begin_pos == 0 ? 0 : sum_weights_[begin_pos - 1];
         float limit_end = sum_weights_[end_pos];
         float r = ThreadLocalRandom() * (limit_end - limit_begin) +

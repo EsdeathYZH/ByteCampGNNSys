@@ -39,11 +39,11 @@ class ClientWithoutCache : public ClientBase {
                           const ByteGraph::SampleStrategy::type& sampleStrategy,
                           ByteGraph::BatchNodes& batchNodes) override;
 
-    void GetNodeFeature(const ByteGraph::NodeId& nodeId, const std::vector<ByteGraph::FeatureType>& featureTypes,
+    void GetNodeFeature(const ByteGraph::NodeId& nodeId, const ByteGraph::FeatureType& featureType,
                         ByteGraph::NodeFeature& nodeFeature) override;
 
     void GetNeighborsWithFeature(const ByteGraph::NodeId& nodeId, const ByteGraph::EdgeType& neighborType,
-                                 const std::vector<ByteGraph::FeatureType>& featureTypes,
+                                 const ByteGraph::FeatureType& featureType,
                                  std::vector<ByteGraph::IDFeaturePair>& neighbors) override;
 
     void SampleNeighbor(const int32_t& batchSize, const ByteGraph::NodeType& nodeType,

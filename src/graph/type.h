@@ -5,7 +5,7 @@
 
 namespace Byte {
 
-using NodeID = uint64_t;
+using NodeID = int64_t;
 using NodeType = uint32_t;
 using EdgeType = uint32_t;
 using FeatureType = uint32_t;

@@ -2,7 +2,9 @@
 
 namespace Byte {
 
-GraphInfo GraphEngine::getGraphInfo() {
+GraphEngine::GraphEngine(std::shared_ptr<Graph> graph) : graph_(graph) {}
+
+GraphMeta GraphEngine::getGraphInfo() {
     return graph_->getGraphMeta();
 }
 
@@ -42,7 +44,9 @@ std::vector<NodeID> GraphEngine::sampleNodeNeighbors(NodeID node_id, EdgeType ed
     return std::vector<NodeID>();
 }
 
-std::vector<NodeID> GraphEngine::randomWalk(NodeID root_node, EdgeType edge_type, int walk_len);
+std::vector<NodeID> GraphEngine::randomWalk(NodeID root_node, EdgeType edge_type, int walk_len) {
     // FIXME: should be implemented by client?
     return std::vector<NodeID>();
+}
+
 }

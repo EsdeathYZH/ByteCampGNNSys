@@ -15,6 +15,7 @@ enum class SamplingStrategy {
 
 class GraphEngine {
 public:
+    explicit GraphEngine(std::shared_ptr<Graph> graph);
     // used by 1st request type
     GraphMeta getGraphInfo();
     // used by 2nd & 3rd request type
@@ -27,7 +28,7 @@ public:
     // used by 6th request type
     std::vector<NodeID> sampleNodeNeighbors(NodeID node_id, EdgeType edge_type, int neigh_num);
     // used by 7th request type
-    NodeList randomWalk(NodeID root_node, EdgeType edge_type, int walk_len);
+    std::vector<NodeID> randomWalk(NodeID root_node, EdgeType edge_type, int walk_len);
 private:
     std::shared_ptr<Graph> graph_; 
 };

@@ -12,7 +12,7 @@ namespace at = ::apache::thrift;
 namespace atp = ::apache::thrift::protocol;
 namespace att = ::apache::thrift::transport;
 
-class GraphServicesHandler : virtual public GraphServicesIf {
+class GraphServicesHandler : virtual public ByteGraph::GraphServicesIf {
    public:
     GraphServicesHandler(std::shared_ptr<Byte::GraphEngine> engine);
 
@@ -33,7 +33,7 @@ class GraphServicesHandler : virtual public GraphServicesIf {
                           const ByteGraph::NodeId node_id, 
                           const ByteGraph::EdgeType edge_type);
 
-    void GetNeighborsWithFeature(std::vector<IDFeaturePair>& _return, 
+    void GetNeighborsWithFeature(std::vector<ByteGraph::IDFeaturePair>& _return, 
                                  const ByteGraph::NodeId node_id,
                                  const ByteGraph::EdgeType edge_type, 
                                  const ByteGraph::FeatureType feat_type);

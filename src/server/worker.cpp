@@ -1,14 +1,19 @@
+#include <glog/logging.h>
 #include "worker.h"
 
 #include <iostream>
 
 int main(int argc, char** argv) {
-    std::cout << "[Server cout] hello worker\n";
+    // Initialize Google’s logging library.
+    google::InitGoogleLogging(argv[0]);
+    google::SetLogDestination(google::INFO, "/tmp/log/INFO_");
+    int worker_idx = std::atoi(argv[1]);
+    std::cout << "[Server cout] hello worker" << worker_idx << "\n";
     int port = 9090;
-    ::std::shared_ptr<Byte::Graph> graph = std::make_shared<Byte::Graph>("/dataset");
+    ::std::shared_ptr<Byte::Graph> graph = std::make_shared<Byte::Graph>(worker_idx, "/dataset");
     ::std::shared_ptr<Byte::GraphEngine> engine(new Byte::GraphEngine(graph));
     ::std::shared_ptr<GraphServicesHandler> handler(new GraphServicesHandler(engine));
-    ::std::shared_ptr<at::server::TProcessor> processor(new GraphServicesProcessor(handler));
+    ::std::shared_ptr<at::server::TProcessor> processor(new ByteGraph::GraphServicesProcessor(handler));
 
     ::std::shared_ptr<att::TNonblockingServerSocket> serverTransport(new att::TNonblockingServerSocket(port));
     ::std::shared_ptr<atp::TProtocolFactory> protocolFactory(new atp::TBinaryProtocolFactory());
@@ -65,7 +70,7 @@ void GraphServicesHandler::GetNodeFeature(ByteGraph::NodeFeature& _return,
         memcpy(_return.data(), feat.data, feat.sz * sizeof(Byte::FeatureData));
     } else {
         for(int i = 0; i < feat.sz; i++) {
-            memcpy(_return.data()+i, feat.data+stride*i, sizeof(Byte::FeatureData));
+            memcpy(_return.data()+i, feat.data+feat.stride*i, sizeof(Byte::FeatureData));
         }
     }
 }
