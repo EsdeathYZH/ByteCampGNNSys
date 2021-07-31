@@ -23,10 +23,12 @@ set(CLIENT_SRC
 set(SERVER_SRC
         server/worker.h
         server/worker.cpp
-        graph/graph_loader.h
         graph/graph.h
+        graph/graph.cpp
         utils/random.h
-        engine/sampling_engine.h
+        engine/graph_engine.h
+        engine/graph_engine.cpp
+        engine/its_sampling.h
         ${THRIFT_SRC}
         )
 
@@ -45,6 +47,6 @@ add_executable(GraphServer
         )
 
 target_link_libraries(GraphServer
-        ${THRIFT_LIBRARIES}
-        ${NONBLOCKING_LIBS}
+        PUBLIC glog::glog
+        PRIVATE ${THRIFT_LIBRARIES} ${NONBLOCKING_LIBS}
         )

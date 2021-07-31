@@ -42,7 +42,7 @@ void ClientWithCache::SampleBatchNodes(const ByteGraph::NodeType &type, const in
 }
 
 void ClientWithCache::GetNodeFeature(const ByteGraph::NodeId &nodeId,
-                                     const std::vector<ByteGraph::FeatureType> &featureTypes,
+                                     const ByteGraph::FeatureType &featureTypes,
                                      ByteGraph::NodeFeature &nodeFeature) {
     auto cache_hit = cache_->GetNodeFeature(nodeId, nodeFeature);
     // todo: current return all features, maybe
@@ -55,7 +55,7 @@ void ClientWithCache::GetNodeFeature(const ByteGraph::NodeId &nodeId,
 }
 
 void ClientWithCache::GetNeighborsWithFeature(const ByteGraph::NodeId &nodeId, const ByteGraph::EdgeType &edgeType,
-                                              const std::vector<ByteGraph::FeatureType> &featureTypes,
+                                              const ByteGraph::FeatureType &featureTypes,
                                               std::vector<ByteGraph::IDFeaturePair> &neighbors) {
     ByteGraph::Neighbor neighborNodes;
     auto cacheHit = cache_->GetNeighbors(nodeId, edgeType, neighborNodes);

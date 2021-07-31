@@ -17,11 +17,11 @@ class ClientBase {
                                   const ByteGraph::SampleStrategy::type& sampleStrategy,
                                   ByteGraph::BatchNodes& batchNodes) = 0;
 
-    virtual void GetNodeFeature(const ByteGraph::NodeId& nodeId, const std::vector<ByteGraph::FeatureType>& featureId,
+    virtual void GetNodeFeature(const ByteGraph::NodeId& nodeId, const ByteGraph::FeatureType& featureId,
                                 ByteGraph::NodeFeature& nodeFeature) = 0;
 
     virtual void GetNeighborsWithFeature(const ByteGraph::NodeId& nodeId, const ByteGraph::EdgeType& neighborType,
-                                         const std::vector<ByteGraph::FeatureType>& featureTypes,
+                                         const ByteGraph::FeatureType& featureType,
                                          std::vector<ByteGraph::IDFeaturePair>& neighbors) = 0;
 
     virtual void SampleNeighbor(const int32_t& batch_size, const ByteGraph::NodeType& nodeType,
@@ -32,6 +32,6 @@ class ClientBase {
                             std::vector<ByteGraph::NodeId>& nodes) = 0;
 };
 
-}  // namespace ByteCamp
+} // namespace ByteCamp
 
-#endif  // BYTEGRAPH_CLIENT_BASE_H_
+#endif // BYTEGRAPH_CLIENT_BASE_H_

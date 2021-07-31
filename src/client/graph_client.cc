@@ -29,9 +29,9 @@ int main(int argc, char **argv) {
     NodeFeature r;
     client->GetNodeFeature(14, {22}, r);
     LOG(INFO) << "GetNodeFeature";
-    std::vector<FeatureType> featureTypes;
+    FeatureType featureType;
     std::vector<IDFeaturePair> neighbors;
-    client->GetNeighborsWithFeature(1, 2, featureTypes, neighbors);
+    client->GetNeighborsWithFeature(1, 2, featureType, neighbors);
     LOG(INFO) << "GetNeighborsWithFeature";
     std::vector<NodeId> nodes;
     client->RandomWalk(1024, 2, nodes);
