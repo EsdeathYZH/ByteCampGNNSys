@@ -38,10 +38,10 @@ class ClientWithCache : public ClientBase {
                           ByteGraph::BatchNodes& batchNodes) override;
 
     void GetNodeFeature(const std::vector<ByteGraph::NodeId>& nodes, const ByteGraph::FeatureType& featureId,
-                        ByteGraph::NodeFeature& nodeFeature) override;
+                        ByteGraph::NodesFeature& nodeFeature) override;
 
     void GetNeighborsWithFeature(const ByteGraph::NodeId& nodeId, const ByteGraph::EdgeType& neighborType,
-                                 const ByteGraph::FeatureType& featureTypes,
+                                 const ByteGraph::FeatureType& featureType,
                                  std::vector<ByteGraph::IDFeaturePair>& neighbors) override;
 
     void SampleNeighbor(const int32_t& batchSize, const ByteGraph::NodeType& nodeType,

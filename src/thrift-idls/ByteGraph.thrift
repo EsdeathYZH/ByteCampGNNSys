@@ -6,6 +6,7 @@ typedef list<i32> NodeFeature
 typedef i64 FeatureType
 typedef list<NodeId> Neighbor
 typedef i64 EdgeType
+typedef list<NodeFeature> NodesFeature
 
 // 获取全图信息
 struct GraphInfo {
@@ -49,7 +50,7 @@ service GraphServices {
     // 全局采样一个Batch的Paper类型点
     BatchNodes SampleBatchNodes(1:NodeType type, 2:i32 batch_size, 3:SampleStrategy strategy)
     // 获取指定点特征
-    NodeFeature GetNodeFeature(1:list<NodeId> node_id, 2:FeatureType feat_type)
+    NodesFeature GetNodeFeature(1:list<NodeId> node_id, 2:FeatureType feat_type)
     // 获取指定点邻居
     Neighbor GetNodeNeighbors(1:NodeId node_id, 2:EdgeType edge_type)
     // 指定Author ID，拉取其P类型(边类型）的一跳邻居并返回特征（P为参数)

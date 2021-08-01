@@ -27,8 +27,9 @@ ClientWithCache::ClientWithCache(std::string peerIP, int port, std::shared_ptr<C
 }
 
 void ClientWithCache::GetFullGraphInfo(ByteGraph::GraphInfo &graphInfo) {
-    auto cache_hit = cache_->GetFullGraphInfo(graphInfo);
-    if (cache_hit) {
+    auto graphInfoPtr = cache_->GetFullGraphInfo();
+    if (nullptr != graphInfoPtr) {
+        graphInfo = *graphInfoPtr;
         return;
     }
     rpc_client_->getFullGraphInfo(graphInfo);
@@ -41,50 +42,53 @@ void ClientWithCache::SampleBatchNodes(const ByteGraph::NodeType &type, const in
     rpc_client_->SampleBatchNodes(batchNodes, type, batchSize, sampleStrategy);
 }
 
-void ClientWithCache::GetNodeFeature(const std::vector<ByteGraph::NodeId>& nodes,
-                                     const ByteGraph::FeatureType &featureTypes,
-                                     ByteGraph::NodeFeature &nodeFeature) {
-    // TODO(wenjing): reimplement using batch getFeature API
-    // auto cache_hit = cache_->GetNodeFeature(nodes, nodeFeature);
-    // // todo: current return all features, maybe
-    // //  should do filter according to featureType
-    // if (cache_hit) {
-    //     return;
-    // }
-    // rpc_client_->GetNodeFeature(nodeFeature, nodes, featureTypes);
-    // for (auto id : nodes) {
-    //     cache_->PutNodeFeature(id, nodeFeature);
-    // }
+void ClientWithCache::GetNodeFeature(const std::vector<ByteGraph::NodeId> &nodes,
+                                     const ByteGraph::FeatureType &featureType, ByteGraph::NodesFeature &nodesFeature) {
+    auto nodesFeaturePtr = cache_->GetNodeFeature(nodes);
+    auto size = nodes.size();
+    std::vector<NodeId> notInCacheNodes;
+    for (size_t i = 0; i < size; ++i) {
+        if (nodesFeaturePtr[i] == nullptr) {
+            notInCacheNodes.push_back(nodes[i]);
+        }
+    }
+    NodesFeature notInCacheNodesFeature;
+    rpc_client_->GetNodeFeature(notInCacheNodesFeature, notInCacheNodes, featureType);
+    assert(notInCacheNodes.size() == notInCacheNodesFeature.size());
+    size = notInCacheNodes.size();
+    for (size_t i = 0; i < size; ++i) {
+        cache_->PutNodeFeature(notInCacheNodes[i], notInCacheNodesFeature[i]);
+    }
+    nodesFeaturePtr = cache_->GetNodeFeature(nodes);
+    size = nodes.size();
+    nodesFeature.clear();
+    nodesFeature.reserve(size);
+    for (size_t i = 0; i < size; ++i) {
+        nodesFeature.push_back(*nodesFeaturePtr[i]);
+    }
 }
 
 void ClientWithCache::GetNeighborsWithFeature(const ByteGraph::NodeId &nodeId, const ByteGraph::EdgeType &edgeType,
-                                              const ByteGraph::FeatureType &featureTypes,
+                                              const ByteGraph::FeatureType &featureType,
                                               std::vector<ByteGraph::IDFeaturePair> &neighbors) {
     ByteGraph::Neighbor neighborNodes;
-    auto cacheHit = cache_->GetNeighbors(nodeId, edgeType, neighborNodes);
-    if (!cacheHit) {
+    auto neighborNodesPtr = cache_->GetNeighbors(nodeId, edgeType);
+    if (nullptr == neighborNodesPtr) {
         // degrade to rpc call
         rpc_client_->GetNodeNeighbors(neighborNodes, nodeId, edgeType);
-        cache_->PutNodeNeighbors(nodeId, neighborNodes);
+        cache_->PutNodeNeighbors(nodeId, edgeType, neighborNodes);
     }
+    auto size = neighborNodes.size();
     // preallocate space
-    neighbors.reserve(neighborNodes.size());
-    // TODO(wenjing): reimplement using batch getFeature API
-    // for (const auto &node : neighborNodes) {
-    //     ByteGraph::NodeFeature nodeFeature;
-    //     // todo: current return all features, maybe
-    //     //  should do filter according to featureType
-    //     cacheHit = cache_->GetNodeFeature(node, nodeFeature);
-    //     if (!cacheHit) {
-    //         // degrade to rpc call
-    //         rpc_client_->GetNodeFeature(nodeFeature, node, featureTypes);
-    //         cache_->PutNodeFeature(node, nodeFeature);
-    //     }
-    //     ByteGraph::IDFeaturePair tmpPair;
-    //     tmpPair.node_id = node;
-    //     tmpPair.features.emplace_back(std::move(nodeFeature));
-    //     neighbors.emplace_back(std::move(tmpPair));
-    // }
+    neighbors.reserve(size);
+    NodesFeature neighborNodesFeature;
+    GetNodeFeature(neighborNodes, featureType, neighborNodesFeature);
+    for (size_t i = 0; i < size; ++i) {
+        IDFeaturePair tmp;
+        tmp.node_id = neighborNodes[i];
+        tmp.features.push_back(std::move(neighborNodesFeature[i]));
+        neighbors.push_back(std::move(tmp));
+    }
 }
 
 void ClientWithCache::SampleNeighbor(const int32_t &batchSize, const ByteGraph::NodeType &nodeType,
