@@ -18,7 +18,7 @@ class ClientBase {
                                   ByteGraph::BatchNodes& batchNodes) = 0;
 
     virtual void GetNodeFeature(const std::vector<ByteGraph::NodeId>& nodes, const ByteGraph::FeatureType& featureId,
-                                ByteGraph::NodeFeature& nodeFeature) = 0;
+                                ByteGraph::NodesFeature& nodeFeature) = 0;
 
     virtual void GetNeighborsWithFeature(const ByteGraph::NodeId& nodeId, const ByteGraph::EdgeType& neighborType,
                                          const ByteGraph::FeatureType& featureType,

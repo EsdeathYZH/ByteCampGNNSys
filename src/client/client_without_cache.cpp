@@ -34,7 +34,7 @@ void ClientWithoutCache::SampleBatchNodes(const ByteGraph::NodeType &type, const
 
 void ClientWithoutCache::GetNodeFeature(const std::vector<ByteGraph::NodeId> &nodes,
                                         const ByteGraph::FeatureType &featureType,
-                                        ByteGraph::NodeFeature &nodeFeature) {
+                                        ByteGraph::NodesFeature &nodeFeature) {
     rpc_client_->GetNodeFeature(nodeFeature, nodes, featureType);
 }
 
