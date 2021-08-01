@@ -23,18 +23,26 @@ int main(int argc, char **argv) {
     GraphInfo graphInfo;
     client->GetFullGraphInfo(graphInfo);
     LOG(INFO) << "GetFullGraphInfo";
+    LOG(INFO) << "num_papers:" << graphInfo.infos_[0];
+    LOG(INFO) << "num_authors:" << graphInfo.infos_[1];
+    LOG(INFO) << "num_institutions:" << graphInfo.infos_[2];
+    LOG(INFO) << "feature_dim:" << graphInfo.infos_[3];
+    LOG(INFO) << "num_classes:" << graphInfo.infos_[4];
     BatchNodes batchNodes;
-    client->SampleBatchNodes(1, 1024, SampleStrategy::ALIAS, batchNodes);
+    client->SampleBatchNodes(1, 16, SampleStrategy::RANDOM, batchNodes);
     LOG(INFO) << "SampleBatchNodes";
-    NodeFeature r;
-    client->GetNodeFeature(14, {22}, r);
-    LOG(INFO) << "GetNodeFeature";
-    FeatureType featureType;
-    std::vector<IDFeaturePair> neighbors;
-    client->GetNeighborsWithFeature(1, 2, featureType, neighbors);
-    LOG(INFO) << "GetNeighborsWithFeature";
-    std::vector<NodeId> nodes;
-    client->RandomWalk(1024, 2, nodes);
-    LOG(INFO) << "RandomWalk";
+    for(int i = 0 ; i < 16; i++) {
+        LOG(INFO) << batchNodes.node_ids[i];
+    }
+    // NodeFeature r;
+    // client->GetNodeFeature({14}, {22}, r);
+    // LOG(INFO) << "GetNodeFeature";
+    // FeatureType featureType;
+    // std::vector<IDFeaturePair> neighbors;
+    // client->GetNeighborsWithFeature(1, 2, featureType, neighbors);
+    // LOG(INFO) << "GetNeighborsWithFeature";
+    // std::vector<NodeId> nodes;
+    // client->RandomWalk(1024, 2, nodes);
+    // LOG(INFO) << "RandomWalk";
     return 0;
 }

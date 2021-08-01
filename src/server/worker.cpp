@@ -3,10 +3,23 @@
 
 #include <iostream>
 
+static void
+usage(char *fn)
+{
+    std::cout << "usage: " << fn << " <partition_idx> [options]" << std::endl;
+    std::cout << "options:" << std::endl;
+}
+
 int main(int argc, char** argv) {
     // Initialize Google’s logging library.
     google::InitGoogleLogging(argv[0]);
     google::SetLogDestination(google::INFO, "/tmp/log/INFO_");
+
+    if (argc < 2) {
+        usage(argv[0]);
+        exit(EXIT_FAILURE);
+    }
+
     int worker_idx = std::atoi(argv[1]);
     std::cout << "[Server cout] hello worker" << worker_idx << "\n";
     int port = 9090;
@@ -60,19 +73,19 @@ void GraphServicesHandler::SampleBatchNodes(ByteGraph::BatchNodes& _return,
 }
 
 void GraphServicesHandler::GetNodeFeature(ByteGraph::NodeFeature& _return, 
-                                          const ByteGraph::NodeId node_id,
+                                          const std::vector<ByteGraph::NodeId>& nodes,
                                           const ByteGraph::FeatureType feat_type) {
-    // Your implementation goes here
+    // TODO(zihang): reimplement batch API
     printf("[Server printf] GetNodeFeature\n");
-    Byte::Feature feat = engine_->getNodeFeature(node_id, feat_type);
-    _return.resize(feat.sz);
-    if(feat.stride == 1) {
-        memcpy(_return.data(), feat.data, feat.sz * sizeof(Byte::FeatureData));
-    } else {
-        for(int i = 0; i < feat.sz; i++) {
-            memcpy(_return.data()+i, feat.data+feat.stride*i, sizeof(Byte::FeatureData));
-        }
-    }
+    // Byte::Feature feat = engine_->getNodeFeature(nodes, feat_type);
+    // _return.resize(feat.sz);
+    // if(feat.stride == 1) {
+    //     memcpy(_return.data(), feat.data, feat.sz * sizeof(Byte::FeatureData));
+    // } else {
+    //     for(int i = 0; i < feat.sz; i++) {
+    //         memcpy(_return.data()+i, feat.data+feat.stride*i, sizeof(Byte::FeatureData));
+    //     }
+    // }
 }
 
 void GraphServicesHandler::GetNodeNeighbors(ByteGraph::Neighbor& _return, 

@@ -37,9 +37,9 @@ struct NeighborList
 };
 
 struct GraphMeta {
-    uint32_t num_papers;
-    uint32_t num_authors;
-    uint32_t num_institutions;
+    uint64_t num_papers;
+    uint64_t num_authors;
+    uint64_t num_institutions;
     uint32_t paper_feat_dim;
     uint32_t num_classes;
 };
