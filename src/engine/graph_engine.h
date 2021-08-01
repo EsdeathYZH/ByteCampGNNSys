@@ -5,6 +5,7 @@
 #include "graph/type.h"
 #include "graph/graph.h"
 #include "engine/its_sampling.h"
+#include "engine/alias_sampling.h"
 
 namespace Byte {
 

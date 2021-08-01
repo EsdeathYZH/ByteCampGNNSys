@@ -31,12 +31,15 @@ int main(int argc, char **argv) {
     BatchNodes batchNodes;
     client->SampleBatchNodes(1, 16, SampleStrategy::RANDOM, batchNodes);
     LOG(INFO) << "SampleBatchNodes";
-    for(int i = 0 ; i < 16; i++) {
+    for(int i = 0 ; i < 4; i++) {
         LOG(INFO) << batchNodes.node_ids[i];
     }
-    // NodeFeature r;
-    // client->GetNodeFeature({14}, {22}, r);
-    // LOG(INFO) << "GetNodeFeature";
+    std::vector<NodeFeature> r;
+    client->GetNodeFeature({3}, 7, r);
+    LOG(INFO) << "GetNodeFeature";
+    for(int i = 0 ; i < 4; i++) {
+        LOG(INFO) << ((float*)r[0].data())[i];
+    }
     // FeatureType featureType;
     // std::vector<IDFeaturePair> neighbors;
     // client->GetNeighborsWithFeature(1, 2, featureType, neighbors);

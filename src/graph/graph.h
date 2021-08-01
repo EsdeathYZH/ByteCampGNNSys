@@ -33,6 +33,8 @@ private:
     EdgeType PAPER2PAPER = 4;
     EdgeType AUTHOR2PAPER = 5;
     EdgeType AUTHOR2INSTITUTION = 6;
+    FeatureType PAPER_FEATURE = 7;
+    FeatureType PAPER_LABEL = 8;
 
     int partition_id;
     int paper_feat_dim = 768;
@@ -48,7 +50,7 @@ private:
     std::unordered_map<NodeType, std::vector<NodeID>> node_ids;
 
     // feature data
-    FeatureStorageType feat_store_type;
+    FeatureStorageType feat_store_type = FeatureStorageType::ROW_STORE;
     std::unordered_map<FeatureType, std::unordered_map<NodeID, uint32_t>> feature_map_;
     std::unordered_map<FeatureType, std::vector<FeatureData>> feature_data_;
 

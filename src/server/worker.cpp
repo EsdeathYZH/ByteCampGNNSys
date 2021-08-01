@@ -72,20 +72,22 @@ void GraphServicesHandler::SampleBatchNodes(ByteGraph::BatchNodes& _return,
     }
 }
 
-void GraphServicesHandler::GetNodeFeature(ByteGraph::NodeFeature& _return, 
+void GraphServicesHandler::GetNodeFeature(std::vector<ByteGraph::NodeFeature>& _return, 
                                           const std::vector<ByteGraph::NodeId>& nodes,
                                           const ByteGraph::FeatureType feat_type) {
-    // TODO(zihang): reimplement batch API
     printf("[Server printf] GetNodeFeature\n");
-    // Byte::Feature feat = engine_->getNodeFeature(nodes, feat_type);
-    // _return.resize(feat.sz);
-    // if(feat.stride == 1) {
-    //     memcpy(_return.data(), feat.data, feat.sz * sizeof(Byte::FeatureData));
-    // } else {
-    //     for(int i = 0; i < feat.sz; i++) {
-    //         memcpy(_return.data()+i, feat.data+feat.stride*i, sizeof(Byte::FeatureData));
-    //     }
-    // }
+    _return.resize(nodes.size());
+    for(int i = 0; i < nodes.size(); i++) {
+        Byte::Feature feat = engine_->getNodeFeature(nodes[i], feat_type);
+        _return[i].resize(feat.sz);
+        if(feat.stride == 1) {
+            memcpy(_return[i].data(), feat.data, feat.sz * sizeof(Byte::FeatureData));
+        } else {
+            for(int j = 0; j < feat.sz; j++) {
+                memcpy(_return[i].data()+j, feat.data+feat.stride*j, sizeof(Byte::FeatureData));
+            }
+        }
+    }
 }
 
 void GraphServicesHandler::GetNodeNeighbors(ByteGraph::Neighbor& _return, 
