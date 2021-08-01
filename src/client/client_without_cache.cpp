@@ -32,10 +32,10 @@ void ClientWithoutCache::SampleBatchNodes(const ByteGraph::NodeType &type, const
     rpc_client_->SampleBatchNodes(batchNodes, type, batchSize, sampleStrategy);
 }
 
-void ClientWithoutCache::GetNodeFeature(const ByteGraph::NodeId &nodeId,
+void ClientWithoutCache::GetNodeFeature(const std::vector<ByteGraph::NodeId> &nodes,
                                         const ByteGraph::FeatureType &featureType,
                                         ByteGraph::NodeFeature &nodeFeature) {
-    rpc_client_->GetNodeFeature(nodeFeature, nodeId, featureType);
+    rpc_client_->GetNodeFeature(nodeFeature, nodes, featureType);
 }
 
 void ClientWithoutCache::GetNeighborsWithFeature(const ByteGraph::NodeId &nodeId,

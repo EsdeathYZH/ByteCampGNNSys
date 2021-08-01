@@ -26,7 +26,7 @@ class GraphServicesHandler : virtual public ByteGraph::GraphServicesIf {
                           const ByteGraph::SampleStrategy::type strategy);
 
     void GetNodeFeature(ByteGraph::NodeFeature& _return, 
-                        const ByteGraph::NodeId node_id, 
+                        const std::vector<ByteGraph::NodeId>& nodes, 
                         const ByteGraph::FeatureType feat_type);
 
     void GetNodeNeighbors(ByteGraph::Neighbor& _return, 
