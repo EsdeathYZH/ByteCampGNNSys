@@ -11,7 +11,7 @@ NodeList Graph::getNeighbors(NodeID node_id, EdgeType edge_type) {
     NeighborList neigh_list = edge_map_[edge_type][node_id];
     NodeList node_list;
     node_list.data = &edge_data_[edge_type][neigh_list.index];
-    node_list.sz = neigh_list.sz; 
+    node_list.sz = neigh_list.sz;
     return node_list;
 }
 
@@ -27,6 +27,7 @@ Feature Graph::getFeatureData(NodeID node_id, FeatureType feat_type) {
     FeatureTypeMeta meta = this->getFeatureTypeMeta(feat_type);
     uint32_t feat_dim = meta.feature_dim;
     uint32_t feat_num = feature_data_[feat_type].size() / feat_dim;
+    std::cout << "feat_num:" << feat_num << std::endl;
     uint32_t index = feature_map_[feat_type][node_id];
     if(feat_store_type == FeatureStorageType::COL_STORE) {
         result.data = feature_data_[feat_type].data() + index;
@@ -35,6 +36,7 @@ Feature Graph::getFeatureData(NodeID node_id, FeatureType feat_type) {
     } else {
         result.data = feature_data_[feat_type].data() + index * feat_dim;
         result.sz = feat_dim;
+        std::cout << "feat_dim:" << feat_dim << std::endl;
         result.stride = 1;
     }
     return result;
@@ -98,14 +100,24 @@ void Graph::load(std::string data_dir) {
     edge_type_meta_[AUTHOR2PAPER] = author2paper_meta;
     edge_type_meta_[AUTHOR2INSTITUTION] = author2institution_meta;
 
+    FeatureTypeMeta paper_feature_meta;
+    paper_feature_meta.feature_dim = graph_meta_.paper_feat_dim;
+    paper_feature_meta.item_bytes = 4;
+    FeatureTypeMeta paper_label_meta;
+    paper_label_meta.feature_dim = graph_meta_.num_classes;
+    paper_label_meta.item_bytes = 4;
+
+    feature_type_meta_[PAPER_FEATURE] = paper_feature_meta;
+    feature_type_meta_[PAPER_LABEL] = paper_label_meta;
+
     // load data
     std::string path = data_dir + "/" + std::to_string(partition_id);
     load_paper_nodes();
     load_author_nodes();
     load_institution_nodes();
-    load_paper2paper_edges(path);
-    load_author2paper_edges(path);
-    load_author2institution_edges(path);
+    // load_paper2paper_edges(path);
+    // load_author2paper_edges(path);
+    // load_author2institution_edges(path);
     load_paper_label(path + "/paper_label.txt");
     load_paper_feature(path + "/paper_feature.txt");
 }
@@ -194,7 +206,16 @@ void Graph::load_edges(EdgeType edge_type, std::string file_path) {
 }
 
 void Graph::load_paper_feature(std::string file_path) {
-
+    // TODO: use real feature data
+    FeatureTypeMeta feat_meta = feature_type_meta_[PAPER_FEATURE];
+    feature_map_[PAPER_FEATURE] = std::unordered_map<NodeID, uint32_t>();
+    feature_data_[PAPER_FEATURE] = std::vector<FeatureData>(300 * feat_meta.feature_dim);
+    for(int i = 0; i < 300; i++) { // generate 300 papers' feature
+        feature_map_[PAPER_FEATURE][node_ids[PAPER][i]] = i;
+        for(int idx = i * feat_meta.feature_dim; idx < (i+1) * feat_meta.feature_dim; idx++) {
+            feature_data_[PAPER_FEATURE][idx] = i + 3.14159;
+        }
+    }
 }
 
 void Graph::load_paper_label(std::string file_path) {

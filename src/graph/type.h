@@ -61,7 +61,6 @@ struct EdgeTypeMeta {
 struct FeatureTypeMeta {
     uint32_t feature_dim;
     uint8_t item_bytes;
-    bool is_dense;
 };
 
 }
