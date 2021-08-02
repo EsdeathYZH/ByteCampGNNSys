@@ -1,29 +1,19 @@
 #include "client_with_cache.h"
 
 #include <glog/logging.h>
-#include <thrift/protocol/TBinaryProtocol.h>
-#include <thrift/transport/TBufferTransports.h>
-#include <thrift/transport/TSocket.h>
+#include "rpc_client.h"
 
 #include "cache_base.h"
 
 using std::string;
 
-namespace at = ::apache::thrift;
-namespace atp = ::apache::thrift::protocol;
-namespace att = ::apache::thrift::transport;
-
 using namespace ::ByteGraph;
 using namespace ::ByteCamp;
 
 ClientWithCache::ClientWithCache(std::string peerIP, int port, std::shared_ptr<Cache> cache)
-    : socket_(std::make_shared<att::TSocket>(std::move(peerIP), port))
-    , transport_(std::static_pointer_cast<att::TTransport>(std::make_shared<att::TFramedTransport>(socket_)))
-    , protocol_(std::static_pointer_cast<atp::TProtocol>(std::make_shared<atp::TBinaryProtocol>(transport_)))
-    , rpc_client_(std::make_shared<ByteGraph::GraphServicesClient>(protocol_))
+    : rpc_client_(std::make_shared<RpcClient>(peerIP, port))
     , cache_(std::move(cache)) {
     // open connection, may throw exception.
-    transport_->open();
 }
 
 void ClientWithCache::GetFullGraphInfo(ByteGraph::GraphInfo &graphInfo) {
@@ -32,14 +22,14 @@ void ClientWithCache::GetFullGraphInfo(ByteGraph::GraphInfo &graphInfo) {
         graphInfo = *graphInfoPtr;
         return;
     }
-    rpc_client_->getFullGraphInfo(graphInfo);
+    rpc_client_->GetFullGraphInfo(graphInfo);
     cache_->PutFullGraphInfo(graphInfo);
 }
 
 void ClientWithCache::SampleBatchNodes(const ByteGraph::NodeType &type, const int32_t &batchSize,
                                        const ByteGraph::SampleStrategy::type &sampleStrategy,
                                        ByteGraph::BatchNodes &batchNodes) {
-    rpc_client_->SampleBatchNodes(batchNodes, type, batchSize, sampleStrategy);
+    rpc_client_->SampleBatchNodes(type, batchSize, sampleStrategy, batchNodes);
 }
 
 void ClientWithCache::GetNodeFeature(const std::vector<ByteGraph::NodeId> &nodes,
@@ -53,7 +43,7 @@ void ClientWithCache::GetNodeFeature(const std::vector<ByteGraph::NodeId> &nodes
         }
     }
     NodesFeature notInCacheNodesFeature;
-    rpc_client_->GetNodeFeature(notInCacheNodesFeature, notInCacheNodes, featureType);
+    rpc_client_->GetNodeFeature(notInCacheNodes, featureType, notInCacheNodesFeature);
     assert(notInCacheNodes.size() == notInCacheNodesFeature.size());
     size = notInCacheNodes.size();
     for (size_t i = 0; i < size; ++i) {
@@ -75,7 +65,7 @@ void ClientWithCache::GetNeighborsWithFeature(const ByteGraph::NodeId &nodeId, c
     auto neighborNodesPtr = cache_->GetNeighbors(nodeId, edgeType);
     if (nullptr == neighborNodesPtr) {
         // degrade to rpc call
-        rpc_client_->GetNodeNeighbors(neighborNodes, nodeId, edgeType);
+        rpc_client_->GetNodeNeighbors(nodeId, edgeType, neighborNodes);
         cache_->PutNodeNeighbors(nodeId, edgeType, neighborNodes);
     }
     auto size = neighborNodes.size();
@@ -94,10 +84,10 @@ void ClientWithCache::GetNeighborsWithFeature(const ByteGraph::NodeId &nodeId, c
 void ClientWithCache::SampleNeighbor(const int32_t &batchSize, const ByteGraph::NodeType &nodeType,
                                      const ByteGraph::NodeType &neighborType, const int32_t &sampleNum,
                                      std::vector<ByteGraph::IDNeighborPair> &neighbors) {
-    rpc_client_->SampleNeighbor(neighbors, batchSize, nodeType, neighborType, sampleNum);
+    rpc_client_->SampleNeighbor(batchSize, nodeType, neighborType, sampleNum, neighbors);
 }
 
 void ClientWithCache::RandomWalk(const int32_t &batchSize, const int32_t &walkLen,
                                  std::vector<ByteGraph::NodeId> &nodes) {
-    rpc_client_->RandomWalk(nodes, batchSize, walkLen);
+    rpc_client_->RandomWalk(batchSize, walkLen, nodes);
 }

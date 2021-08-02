@@ -3,30 +3,11 @@
 
 #include "client_base.h"
 
-// forward declaration
-namespace apache {
-
-namespace thrift {
-
-namespace protocol {
-
-class TProtocol;
-
-}  // namespace protocol
-
-namespace transport {
-
-class TSocket;
-class TTransport;
-
-}  // namespace transport
-
-}  // namespace thrift
-}  // namespace apache
-
 namespace ByteCamp {
 
+// forward declaration
 class Cache;
+class RpcClient;
 
 class ClientWithCache : public ClientBase {
     ClientWithCache(std::string peerIP, int port, std::shared_ptr<Cache> cache);
@@ -51,10 +32,7 @@ class ClientWithCache : public ClientBase {
     void RandomWalk(const int32_t& batchSize, const int32_t& walkLen, std::vector<ByteGraph::NodeId>& nodes) override;
 
    private:
-    std::shared_ptr<apache::thrift::transport::TSocket> socket_;
-    std::shared_ptr<apache::thrift::transport::TTransport> transport_;
-    std::shared_ptr<apache::thrift::protocol::TProtocol> protocol_;
-    std::shared_ptr<ByteGraph::GraphServicesClient> rpc_client_;
+    std::shared_ptr<RpcClient> rpc_client_;
     std::shared_ptr<Cache> cache_;
 };
 

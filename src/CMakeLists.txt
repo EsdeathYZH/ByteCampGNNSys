@@ -12,6 +12,8 @@ execute_process(COMMAND ${THRIFT_COMPILER} --gen cpp -r ${CMAKE_CURRENT_SOURCE_D
 set(CLIENT_SRC
         client/client_base.h
         client/cache_base.h
+        client/rpc_client.h
+        client/rpc_client.cpp
         client/client_without_cache.h
         client/client_without_cache.cpp
         client/client_with_cache.h
