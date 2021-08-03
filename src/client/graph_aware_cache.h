@@ -22,11 +22,13 @@ class GraphAwareCache : public Cache {
     const int32_t NODE_NEIGHBORS_CACHE_SPLIT = 4500;
 
    public:
-    explicit GraphAwareCache(size_t capacity)
+    explicit GraphAwareCache(size_t capacity, const std::function<bool(ByteGraph::NodeId, ByteGraph::NodeId)>& cmp)
         : graph_info_(nullptr)
         , capacity_(capacity)
         , node_feature_cache_upper_num_(capacity_ / NODE_FEATURE_CACHE_SPLIT)
-        , node_neighbors_cache_upper_num_(capacity_ / NODE_NEIGHBORS_CACHE_SPLIT) {}
+        , node_feature_pq_(cmp)
+        , node_neighbors_cache_upper_num_(capacity_ / NODE_NEIGHBORS_CACHE_SPLIT)
+        , node_neighbors_pq_(cmp) {}
 
     std::shared_ptr<ByteGraph::GraphInfo> GetFullGraphInfo() override;
 
@@ -56,14 +58,14 @@ class GraphAwareCache : public Cache {
     const size_t node_feature_cache_upper_num_;
     std::unordered_map<ByteGraph::NodeId, std::shared_ptr<ByteGraph::NodeFeature>> node_feature_cache_;
     std::priority_queue<ByteGraph::NodeId, std::vector<ByteGraph::NodeId>,
-        std::function<bool(ByteGraph::NodeId, ByteGraph::NodeId)>>
+                        std::function<bool(ByteGraph::NodeId, ByteGraph::NodeId)>>
         node_feature_pq_;
 
     const size_t node_neighbors_cache_upper_num_;
     std::unordered_map<ByteGraph::NodeId, std::unordered_map<ByteGraph::EdgeType, std::shared_ptr<ByteGraph::Neighbor>>>
         node_neighbors_cache_;
     std::priority_queue<ByteGraph::NodeId, std::vector<ByteGraph::NodeId>,
-        std::function<bool(ByteGraph::NodeId, ByteGraph::NodeId)>>
+                        std::function<bool(ByteGraph::NodeId, ByteGraph::NodeId)>>
         node_neighbors_pq_;
 };
 
