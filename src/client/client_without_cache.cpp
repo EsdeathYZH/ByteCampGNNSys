@@ -16,6 +16,9 @@ ClientWithoutCache::ClientWithoutCache(const std::vector<std::pair<std::string, 
     rpc_clients_.reserve(serverAddresses.size());
     for (const auto &server : serverAddresses) {
         auto rpc_client = std::make_shared<RpcClient>(server.first, server.second);
+        GraphInfo graphInfo;
+        rpc_client->GetFullGraphInfo(graphInfo);
+        server_weights_.emplace_back(graphInfo.total_weights_);
         rpc_clients_.emplace_back(rpc_client);
     }
     assert(rpc_clients_.size() == serverAddresses.size());

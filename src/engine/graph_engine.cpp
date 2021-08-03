@@ -10,11 +10,11 @@ GraphMeta GraphEngine::getGraphInfo() {
 
 std::vector<NodeID> GraphEngine::sampleNodesFromRandom(NodeType node_type, int batch_size) {
     std::vector<NodeID> mini_batch;
-    mini_batch.reserve(batch_size);
+    mini_batch.resize(batch_size);
     NodeList nodes = graph_->getNodes(node_type);
     for(int i = 0; i < batch_size; i++) {
-        uint32_t idx = uint32_t(ThreadLocalRandom() * nodes.sz);
-        mini_batch.push_back(nodes.data[idx]);
+        uint32_t idx = uint32_t(FastRandom::xorshf01() * nodes.sz);
+        mini_batch[i] = nodes.data[idx];
     }
     return mini_batch;
 }
