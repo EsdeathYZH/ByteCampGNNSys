@@ -6,32 +6,14 @@
 
 #include "client_base.h"
 
-// forward declaration
-namespace apache {
-
-namespace thrift {
-
-namespace protocol {
-
-class TProtocol;
-
-}  // namespace protocol
-
-namespace transport {
-
-class TSocket;
-class TTransport;
-
-}  // namespace transport
-
-}  // namespace thrift
-}  // namespace apache
-
 namespace ByteCamp {
+
+// forward declaration
+class RpcClient;
 
 class ClientWithoutCache : public ClientBase {
    public:
-    ClientWithoutCache(std::string peerIP, int port);
+    ClientWithoutCache(const std::vector<std::pair<std::string, int>> &serverAddresses);
 
     void GetFullGraphInfo(ByteGraph::GraphInfo& graphInfo) override;
 
@@ -53,10 +35,8 @@ class ClientWithoutCache : public ClientBase {
     void RandomWalk(const int32_t& batchSize, const int32_t& walkLen, std::vector<ByteGraph::NodeId>& nodes) override;
 
    private:
-    std::shared_ptr<apache::thrift::transport::TSocket> socket_;
-    std::shared_ptr<apache::thrift::transport::TTransport> transport_;
-    std::shared_ptr<apache::thrift::protocol::TProtocol> protocol_;
-    std::shared_ptr<ByteGraph::GraphServicesClient> rpc_client_;
+    std::vector<std::shared_ptr<RpcClient>> rpc_clients_;
+    std::vector<double> server_weights_;
 };
 
 }  // namespace ByteCamp

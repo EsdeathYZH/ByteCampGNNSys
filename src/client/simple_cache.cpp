@@ -34,21 +34,23 @@ void SimpleCache::PutFullGraphInfo(const ByteGraph::GraphInfo &graphInfo) {
 
 void SimpleCache::PutNodeFeature(const ByteGraph::NodeId &nodeId, const ByteGraph::NodeFeature &nodeFeature) {
     if (node_feature_cache_.count(nodeId)) {
-        assert(capacity_ >= (node_feature_cache_[nodeId]->size() * sizeof(int32_t)));
-        capacity_ -= node_feature_cache_[nodeId]->size() * sizeof(int32_t);
+        assert(usage_ >= (node_feature_cache_[nodeId]->size() * sizeof(int32_t)));
+        usage_ -= node_feature_cache_[nodeId]->size() * sizeof(int32_t);
     }
+    // todo add capacity limit
     node_feature_cache_[nodeId] = std::make_shared<NodeFeature>(nodeFeature);
-    capacity_ += node_feature_cache_[nodeId]->size() * sizeof(int32_t);
+    usage_ += node_feature_cache_[nodeId]->size() * sizeof(int32_t);
 }
 
 void SimpleCache::PutNodeNeighbors(const ByteGraph::NodeId &nodeId, const ByteGraph::EdgeType &edgeType,
                                    const ByteGraph::Neighbor &neighborNodes) {
     if (node_neighbors_cache_.count(nodeId) && node_neighbors_cache_[nodeId].count(edgeType)) {
-        assert(capacity_ >= node_neighbors_cache_[nodeId][edgeType]->size() * sizeof(nodeId));
-        capacity_ -= node_neighbors_cache_[nodeId][edgeType]->size() * sizeof(nodeId);
+        assert(usage_ >= node_neighbors_cache_[nodeId][edgeType]->size() * sizeof(nodeId));
+        usage_ -= node_neighbors_cache_[nodeId][edgeType]->size() * sizeof(nodeId);
     }
-    node_neighbors_cache_[nodeId][edgeType] = std::make_shared<Neighbor>(neighborNodes);
-    capacity_ += node_neighbors_cache_[nodeId][edgeType]->size() * sizeof(nodeId);
+  // todo add capacity limit
+  node_neighbors_cache_[nodeId][edgeType] = std::make_shared<Neighbor>(neighborNodes);
+    usage_ += node_neighbors_cache_[nodeId][edgeType]->size() * sizeof(nodeId);
 }
 
 void SimpleCache::DelFullGraphInfo() { graph_info_.reset(); }
@@ -60,4 +62,8 @@ void SimpleCache::DelNodeFeature(const ByteGraph::NodeId &nodeId) {
 void SimpleCache::DelNodeNeighbors(const ByteGraph::NodeId &nodeId, const ByteGraph::EdgeType &edgeType) {
     if (node_neighbors_cache_.count(nodeId) && node_neighbors_cache_[nodeId].count(edgeType))
         node_neighbors_cache_[nodeId][edgeType].reset();
+}
+
+std::shared_ptr<Cache> NewSimpleCache(size_t capacity) {
+  return std::static_pointer_cast<Cache>(std::make_shared<SimpleCache>(capacity));
 }
