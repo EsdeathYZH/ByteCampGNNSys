@@ -214,7 +214,7 @@ void Graph::load_edges(EdgeType edge_type, std::string file_path) {
     //     degree_file << pair.first << " " << pair.second << "\n";
     // }
     // degree_file.close();
-    
+
     edge_type_meta_[edge_type].local_num = cur_idx;
     std::cout << "edge type " << edge_type << " local num:" << cur_idx 
               << " src num:" << edge_map_[edge_type].size() << std::endl;
@@ -223,14 +223,14 @@ void Graph::load_edges(EdgeType edge_type, std::string file_path) {
 
 void Graph::load_paper_feature(std::string file_path) {
     // TODO: use real feature data
-    uint64_t paper_num = 300;
+    uint64_t paper_num = node_ids[PAPER].size();
     FeatureTypeMeta feat_meta = feature_type_meta_[PAPER_FEATURE];
     feature_map_[PAPER_FEATURE] = std::unordered_map<NodeID, uint32_t>();
     feature_data_[PAPER_FEATURE] = std::vector<FeatureData>(paper_num * feat_meta.feature_dim);
     for(int i = 0; i < paper_num; i++) { // generate papers' feature
         feature_map_[PAPER_FEATURE][node_ids[PAPER][i]] = i;
         for(int idx = i * feat_meta.feature_dim; idx < (i+1) * feat_meta.feature_dim; idx++) {
-            feature_data_[PAPER_FEATURE][idx] = i + 3.14159;
+            feature_data_[PAPER_FEATURE][idx] = i % 2 + 0.14159;
         }
     }
 

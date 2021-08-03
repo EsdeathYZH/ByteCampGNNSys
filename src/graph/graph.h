@@ -27,15 +27,6 @@ public:
     WeightList getNodeWeights(NodeType node_type, FeatureType feat_type, int32_t idx);
 
 private:
-    NodeType PAPER = 1;
-    NodeType AUTHOR = 2;
-    NodeType INSTITUTION = 3;
-    EdgeType PAPER2PAPER = 4;
-    EdgeType AUTHOR2PAPER = 5;
-    EdgeType AUTHOR2INSTITUTION = 6;
-    FeatureType PAPER_FEATURE = 7;
-    FeatureType PAPER_LABEL = 8;
-
     int partition_id;
     int paper_feat_dim = 768;
     int num_classes = 153;

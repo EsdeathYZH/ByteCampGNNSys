@@ -13,8 +13,8 @@ class ALIASSampling {
 public:
 	explicit ALIASSampling (WeightList& weights){
 		//normalize
-		float sum_weight = 0.0;
-        std::vector<float> norm_weights(weights.sz);
+		double sum_weight = 0.0;
+        std::vector<double> norm_weights(weights.sz);
         for (size_t i = 0; i < weights.sz; i++) {
             sum_weight += weights.data[i * weights.stride];
             norm_weights[i] = weights.data[i * weights.stride];
@@ -93,7 +93,7 @@ public:
 		return result;
 	}
 
-	std::vector<float> prob;
+	std::vector<double> prob;
 	std::vector<int> alias;
 
 	int64_t nextLong(int64_t n) const {

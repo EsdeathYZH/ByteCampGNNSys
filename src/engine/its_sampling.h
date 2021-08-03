@@ -47,8 +47,8 @@ public:
     }
 
 private:
-    std::vector<float> sum_weights_;
-    float sum_weight_;
+    std::vector<double> sum_weights_;
+    double sum_weight_;
 };
 
 }
