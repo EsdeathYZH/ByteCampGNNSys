@@ -70,6 +70,6 @@ void GraphAwareCache::DelNodeNeighbors(const ByteGraph::NodeId &nodeId, const By
         node_neighbors_cache_[nodeId][edgeType].reset();
 }
 
-std::shared_ptr<Cache> NewGraphAwareCache(size_t capacity) {
-    return std::static_pointer_cast<Cache>(std::make_shared<GraphAwareCache>(capacity));
+std::shared_ptr<Cache> NewGraphAwareCache(size_t capacity, std::function<bool(ByteGraph::NodeId, ByteGraph::NodeId)> cmp) {
+    return std::static_pointer_cast<Cache>(std::make_shared<GraphAwareCache>(capacity, cmp));
 }
