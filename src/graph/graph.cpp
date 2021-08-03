@@ -116,9 +116,9 @@ void Graph::load(std::string data_dir) {
     load_paper_nodes();
     load_author_nodes();
     load_institution_nodes();
-    // load_paper2paper_edges(path);
-    // load_author2paper_edges(path);
-    // load_author2institution_edges(path);
+    load_paper2paper_edges(path);
+    load_author2paper_edges(path);
+    load_author2institution_edges(path);
     load_paper_label(path + "/paper_label.txt");
     load_paper_feature(path + "/paper_feature.txt");
 }
