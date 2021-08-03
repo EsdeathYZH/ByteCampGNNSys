@@ -227,22 +227,24 @@ void Graph::load_paper_feature(std::string file_path) {
     FeatureTypeMeta feat_meta = feature_type_meta_[PAPER_FEATURE];
     feature_map_[PAPER_FEATURE] = std::unordered_map<NodeID, uint32_t>();
     feature_data_[PAPER_FEATURE] = std::vector<FeatureData>(paper_num * feat_meta.feature_dim);
-    for(int i = 0; i < paper_num; i++) { // generate papers' feature
+    #pragma omp parallel for num_threads(64)
+    for(uint64_t i = 0; i < paper_num; i++) { // generate papers' feature
         feature_map_[PAPER_FEATURE][node_ids[PAPER][i]] = i;
-        for(int idx = i * feat_meta.feature_dim; idx < (i+1) * feat_meta.feature_dim; idx++) {
+        for(uint64_t idx = i * feat_meta.feature_dim; idx < (i+1) * feat_meta.feature_dim; idx++) {
             feature_data_[PAPER_FEATURE][idx] = i % 2 + 0.14159;
         }
     }
-
+    std::cout << "Generate feature data over." << std::endl;
     graph_meta_.sum_weights.resize(graph_meta_.paper_feat_dim);
     #pragma omp parallel for num_threads(64)
-    for (int idx = 0; idx < graph_meta_.paper_feat_dim; idx++) {
+    for (uint64_t idx = 0; idx < graph_meta_.paper_feat_dim; idx++) {
         double sum_weight = 0;
-        for(int i = 0; i < paper_num; i++) {
+        for(uint64_t i = 0; i < paper_num; i++) {
             sum_weight += feature_data_[PAPER_FEATURE][i*graph_meta_.paper_feat_dim+idx];
         }
         graph_meta_.sum_weights[idx] = sum_weight;
     }
+    std::cout << "Calculate weight sum over." << std::endl;
 }
 
 void Graph::load_paper_label(std::string file_path) {
