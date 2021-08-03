@@ -4,8 +4,9 @@
 
 #include "graph_aware_cache.h"
 
-using namespace ByteCamp;
 using namespace ByteGraph;
+
+namespace ByteCamp {
 
 std::shared_ptr<ByteGraph::GraphInfo> GraphAwareCache::GetFullGraphInfo() { return graph_info_; }
 
@@ -73,3 +74,5 @@ void GraphAwareCache::DelNodeNeighbors(const ByteGraph::NodeId &nodeId, const By
 std::shared_ptr<Cache> NewGraphAwareCache(size_t capacity, std::function<bool(ByteGraph::NodeId, ByteGraph::NodeId)> cmp) {
     return std::static_pointer_cast<Cache>(std::make_shared<GraphAwareCache>(capacity, cmp));
 }
+
+} // namespace ByteCamp

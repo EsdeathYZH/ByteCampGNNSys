@@ -5,7 +5,8 @@
 #include <glog/logging.h>
 
 using namespace ByteGraph;
-using namespace ByteCamp;
+
+namespace ByteCamp {
 
 std::shared_ptr<ByteGraph::GraphInfo> LRUCache::GetFullGraphInfo() { return graph_info_; }
 
@@ -100,3 +101,5 @@ void LRUCache::TouchNodeNeighbors(const ByteGraph::NodeId &nodeId) {
 std::shared_ptr<Cache> NewLRUCache(size_t capacity) {
     return std::static_pointer_cast<Cache>(std::make_shared<LRUCache>(capacity));
 }
+
+} // namespace ByteCamp
