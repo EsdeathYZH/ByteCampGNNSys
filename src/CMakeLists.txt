@@ -22,6 +22,8 @@ set(CLIENT_SRC
         client/simple_cache.cpp
         client/lru_cache.h
         client/lru_cache.cpp
+        client/graph_aware_cache.h
+        client/graph_aware_cache.cpp
         utils/random.h
         utils/utils.h
         ${THRIFT_SRC}
