@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
     LOG(INFO) << "feature_dim:" << graphInfo.infos_[3];
     LOG(INFO) << "num_classes:" << graphInfo.infos_[4];
     BatchNodes batchNodes;
-    client->SampleBatchNodes(1, 16, SampleStrategy::RANDOM, batchNodes);
+    client->SampleBatchNodes(1, 16, SampleStrategy::RANDOM, 0, batchNodes);
     LOG(INFO) << "SampleBatchNodes";
     for(int i = 0 ; i < 4; i++) {
         LOG(INFO) << batchNodes.node_ids[i];

@@ -25,12 +25,14 @@ class ClientBase {
                                          const ByteGraph::FeatureType& featureType,
                                          std::vector<ByteGraph::IDFeaturePair>& neighbors) = 0;
 
-    virtual void SampleNeighbor(const int32_t& batch_size, const ByteGraph::NodeType& nodeType,
-                                const ByteGraph::NodeType& neighborType, const int32_t& sampleNum,
-                                std::vector<ByteGraph::IDNeighborPair>& neighbors) = 0;
+    virtual void SampleNeighbor(const int32_t &batchSize, const ByteGraph::NodeType &nodeType,
+                                const ByteGraph::EdgeType &edgeType, const int32_t &sampleNum,
+                                const ByteGraph::SampleStrategy::type &sampleStrategy,
+                                std::vector<std::vector<ByteGraph::NodeId>> &neighbors) = 0;
 
     virtual void RandomWalk(const int32_t& batchSize, const int32_t& walkLen,
-                            std::vector<ByteGraph::NodeId>& nodes) = 0;
+                            const ByteGraph::SampleStrategy::type &sampleStrategy,
+                            std::vector<std::vector<ByteGraph::NodeId>>& nodes) = 0;
 };
 
 } // namespace ByteCamp

@@ -52,7 +52,7 @@ struct GraphMeta {
     uint64_t num_institutions;
     uint32_t paper_feat_dim;
     uint32_t num_classes;
-    std::vector<float> sum_weights;
+    std::vector<double> sum_weights;
 };
 
 struct NodeTypeMeta {

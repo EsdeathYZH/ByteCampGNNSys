@@ -237,7 +237,7 @@ void Graph::load_paper_feature(std::string file_path) {
     graph_meta_.sum_weights.resize(graph_meta_.paper_feat_dim);
     #pragma omp parallel for num_threads(64)
     for (int idx = 0; idx < graph_meta_.paper_feat_dim; idx++) {
-        float sum_weight = 0;
+        double sum_weight = 0;
         for(int i = 0; i < paper_num; i++) {
             sum_weight += feature_data_[PAPER_FEATURE][i*graph_meta_.paper_feat_dim+idx];
         }

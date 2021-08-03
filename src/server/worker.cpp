@@ -54,7 +54,8 @@ void GraphServicesHandler::getFullGraphInfo(ByteGraph::GraphInfo& _return) {
     _return.infos_.push_back(meta.paper_feat_dim);
     _return.infos_.push_back(meta.num_classes);
 
-    _return.total_weights_.assign(std::begin(meta.sum_weights), std::end(meta.sum_weights));
+    _return.total_weights_.resize(meta.sum_weights.size());
+    memcpy(_return.total_weights_.data(), meta.sum_weights.data(), meta.sum_weights.size()*sizeof(double));
 }
 
 void GraphServicesHandler::SampleBatchNodes(ByteGraph::BatchNodes& _return, 

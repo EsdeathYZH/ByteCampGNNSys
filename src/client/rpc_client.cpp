@@ -28,8 +28,9 @@ void RpcClient::GetFullGraphInfo(ByteGraph::GraphInfo &graphInfo) { rpc_client_-
 
 void RpcClient::SampleBatchNodes(const ByteGraph::NodeType &type, const int32_t &batchSize,
                                  const ByteGraph::SampleStrategy::type &sampleStrategy,
+                                 const int32_t feat_idx,
                                  ByteGraph::BatchNodes &batchNodes) {
-    rpc_client_->SampleBatchNodes(batchNodes, type, batchSize, sampleStrategy);
+    rpc_client_->SampleBatchNodes(batchNodes, type, batchSize, sampleStrategy, feat_idx);
 }
 
 void RpcClient::GetNodeFeature(const ByteGraph::NodeId &nodeId, const ByteGraph::FeatureType &featureType, ByteGraph::NodeFeature &nodeFeature){
