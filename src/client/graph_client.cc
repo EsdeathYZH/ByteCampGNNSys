@@ -4,6 +4,7 @@
 #include <thrift/transport/TSocket.h>
 
 #include "client_without_cache.h"
+#include "utils/utils.h"
 
 using std::string;
 using namespace ::ByteGraph;
@@ -16,9 +17,9 @@ int main(int argc, char **argv) {
     // google::SetStderrLogging(google::INFO);
     FLAGS_logtostderr = true;
 
-    string peerIP = "127.0.0.1";
-    int port = 9090;
-    std::vector<std::pair<string, int>> servers{std::make_pair(peerIP, port)};
+    const std::string fileName = "/root/configs/servers.cfg";
+    auto serverAddresses = ReadConfig<std::string, int>(fileName);
+    std::vector<std::pair<string, int>> servers{serverAddresses};
     auto client = std::make_shared<ClientWithoutCache>(servers);
 
     GraphInfo graphInfo;
