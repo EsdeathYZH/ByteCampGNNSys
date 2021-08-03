@@ -2,6 +2,7 @@
 #define BYTEGRAPH_GRAPH_TYPE_H_
 
 #include "stdint.h"
+#include <vector>
 
 namespace Byte {
 
@@ -42,6 +43,7 @@ struct GraphMeta {
     uint64_t num_institutions;
     uint32_t paper_feat_dim;
     uint32_t num_classes;
+    std::vector<float> sum_weights;
 };
 
 struct NodeTypeMeta {

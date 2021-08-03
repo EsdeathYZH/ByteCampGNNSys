@@ -29,8 +29,8 @@ class GraphServicesHandler : virtual public ByteGraph::GraphServicesIf {
                         const std::vector<ByteGraph::NodeId>& nodes, 
                         const ByteGraph::FeatureType feat_type);
 
-    void GetNodeNeighbors(ByteGraph::Neighbor& _return, 
-                          const ByteGraph::NodeId node_id, 
+    void GetNodeNeighbors(std::vector<ByteGraph::Neighbor>& _return, 
+                          const std::vector<ByteGraph::NodeId>& nodes,
                           const ByteGraph::EdgeType edge_type);
 
     void GetNeighborsWithFeature(std::vector<ByteGraph::IDFeaturePair>& _return, 
@@ -38,11 +38,15 @@ class GraphServicesHandler : virtual public ByteGraph::GraphServicesIf {
                                  const ByteGraph::EdgeType edge_type, 
                                  const ByteGraph::FeatureType feat_type);
 
-    void SampleNeighbor(std::vector<ByteGraph::IDNeighborPair>& _return, 
-                        const int32_t batch_size, 
-                        const ByteGraph::NodeType node_type,
-                        const ByteGraph::EdgeType edge_type, 
-                        const int32_t sample_num);
+    void GetNodeWeights(std::vector<int32_t>& _return, 
+                        const std::vector<ByteGraph::NodeId>& nodes, 
+                        const ByteGraph::FeatureType feat_type,
+                        const int32_t feat_idx);
+
+    void SampleNodeNeighbors(std::vector<std::vector<ByteGraph::NodeId>>& _return, 
+                             const std::vector<ByteGraph::NodeId>& nodes, 
+                             const ByteGraph::EdgeType edge_type, 
+                             const int32_t sample_num);
 
     void RandomWalk(std::vector<ByteGraph::NodeId>& _return,
                     const int32_t batch_size,

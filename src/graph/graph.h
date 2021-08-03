@@ -23,8 +23,8 @@ public:
     NodeList getNodes(NodeType node_type);
     NodeList getNeighbors(NodeID node_id, EdgeType edge_type);
     Feature getFeatureData(NodeID node_id, FeatureType feat_type);
-    FeatureData getFeatureItem(NodeID node_id, FeatureType feat_type, uint32_t idx);
-    WeightList getNodeWeights(NodeType node_type, FeatureType feat_type, uint32_t idx);
+    FeatureData getFeatureItem(NodeID node_id, FeatureType feat_type, int32_t idx);
+    WeightList getNodeWeights(NodeType node_type, FeatureType feat_type, int32_t idx);
 
 private:
     NodeType PAPER = 1;
