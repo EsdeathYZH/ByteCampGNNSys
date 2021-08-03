@@ -4,6 +4,7 @@
 
 #include "cache_base.h"
 #include "rpc_client.h"
+#include "utils/utils.h"
 
 using std::string;
 
@@ -33,22 +34,22 @@ void ClientWithCache::GetFullGraphInfo(ByteGraph::GraphInfo &graphInfo) {
 
 void ClientWithCache::SampleBatchNodes(const ByteGraph::NodeType &type, const int32_t &batchSize,
                                        const ByteGraph::SampleStrategy::type &sampleStrategy,
+                                       const int32_t &featureIndex,
                                        ByteGraph::BatchNodes &batchNodes) {
     batchNodes.node_ids.reserve(batchSize);
-    if (sampleStrategy == SampleStrategy::RANDOM) {
-        int32_t size = rpc_clients_.size();
-        int32_t avg = batchSize / size, last = batchSize - (avg * (size - 1));
+    const auto size = rpc_clients_.size();
+    std::vector<int64_t> servers_weight(size, 1);
+    if (sampleStrategy != SampleStrategy::RANDOM) {
         for (size_t i = 0; i < size; ++i) {
-            ByteGraph::BatchNodes tmpBatchNodes;
-            if (i == size - 1) {
-                rpc_clients_[i]->SampleBatchNodes(type, last, sampleStrategy, tmpBatchNodes);
-            } else {
-                rpc_clients_[i]->SampleBatchNodes(type, avg, sampleStrategy, tmpBatchNodes);
-            }
-            batchNodes.node_ids.insert(batchNodes.node_ids.end(), tmpBatchNodes.node_ids.begin(),
-                                       tmpBatchNodes.node_ids.end());
+            servers_weight[i] = server_weights_[i][featureIndex];
         }
-    } else {
+    }
+    auto rpc_clients_batch_node_size = GetBatchSizeAccordingToWeights(servers_weight, batchSize);
+    for (size_t i = 0; i < size; ++i) {
+        ByteGraph::BatchNodes tmpBatchNodes;
+        rpc_clients_[i]->SampleBatchNodes(type, rpc_clients_batch_node_size[i], sampleStrategy, tmpBatchNodes);
+        batchNodes.node_ids.insert(batchNodes.node_ids.end(), tmpBatchNodes.node_ids.begin(),
+                                   tmpBatchNodes.node_ids.end());
     }
 }
 
