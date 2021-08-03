@@ -25,11 +25,19 @@ class GraphServicesHandler : virtual public ByteGraph::GraphServicesIf {
                           const int32_t batch_size,
                           const ByteGraph::SampleStrategy::type strategy);
 
-    void GetNodeFeature(std::vector<ByteGraph::NodeFeature>& _return, 
+    void GetNodeFeature(ByteGraph::NodeFeature& _return, 
+                        const ByteGraph::NodeId node, 
+                        const ByteGraph::FeatureType feat_type);
+
+    void GetBatchNodeFeature(std::vector<ByteGraph::NodeFeature>& _return, 
                         const std::vector<ByteGraph::NodeId>& nodes, 
                         const ByteGraph::FeatureType feat_type);
 
-    void GetNodeNeighbors(std::vector<ByteGraph::Neighbor>& _return, 
+    void GetNodeNeighbors(ByteGraph::Neighbor& _return, 
+                          const ByteGraph::NodeId node,
+                          const ByteGraph::EdgeType edge_type);
+
+    void GetBatchNodeNeighbors(std::vector<ByteGraph::Neighbor>& _return, 
                           const std::vector<ByteGraph::NodeId>& nodes,
                           const ByteGraph::EdgeType edge_type);
 

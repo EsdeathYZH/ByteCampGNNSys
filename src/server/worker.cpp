@@ -40,13 +40,13 @@ GraphServicesHandler::GraphServicesHandler(std::shared_ptr<Byte::GraphEngine> en
     : engine_(engine) {}
 
 void GraphServicesHandler::sayHello(std::string& _return, const int32_t workerId, const std::string& content) {
-    LOG(INFO) << "[Server printf] sayHello";
+    DLOG(INFO) << "[Server printf] sayHello";
     _return = std::string("I am worker ") + std::to_string(workerId) + std::string(", I want to say: ") + content +
               std::string(".");
 }
 
 void GraphServicesHandler::getFullGraphInfo(ByteGraph::GraphInfo& _return) {
-    LOG(INFO) << "[Server printf] getFullGraphInfo";
+    DLOG(INFO) << "[Server printf] getFullGraphInfo";
     Byte::GraphMeta meta = engine_->getGraphInfo();
     _return.infos_.push_back(meta.num_papers);
     _return.infos_.push_back(meta.num_authors);
@@ -61,7 +61,7 @@ void GraphServicesHandler::SampleBatchNodes(ByteGraph::BatchNodes& _return,
                                             const ByteGraph::NodeType type, 
                                             const int32_t batch_size,
                                             const ByteGraph::SampleStrategy::type strategy) {
-    LOG(INFO) << "[Server printf] SampleBatchNodes";
+    DLOG(INFO) << "[Server printf] SampleBatchNodes";
     if(strategy == ByteGraph::SampleStrategy::type::RANDOM) {
         auto nodes = engine_->sampleNodesFromRandom(type, batch_size);
         _return.node_ids.swap(nodes);
@@ -71,10 +71,25 @@ void GraphServicesHandler::SampleBatchNodes(ByteGraph::BatchNodes& _return,
     }
 }
 
-void GraphServicesHandler::GetNodeFeature(std::vector<ByteGraph::NodeFeature>& _return, 
+void GraphServicesHandler::GetNodeFeature(ByteGraph::NodeFeature& _return, 
+                                          const ByteGraph::NodeId node, 
+                                          const ByteGraph::FeatureType feat_type) {
+    DLOG(INFO) << "[Server printf] GetNodeFeature";
+    Byte::Feature feat = engine_->getNodeFeature(node, feat_type);
+    _return.resize(feat.sz);
+    if(feat.stride == 1) {
+        memcpy(_return.data(), feat.data, feat.sz * sizeof(Byte::FeatureData));
+    } else {
+        for(int j = 0; j < feat.sz; j++) {
+            memcpy(_return.data()+j, feat.data+feat.stride*j, sizeof(Byte::FeatureData));
+        }
+    }
+}
+
+void GraphServicesHandler::GetBatchNodeFeature(std::vector<ByteGraph::NodeFeature>& _return, 
                                           const std::vector<ByteGraph::NodeId>& nodes,
                                           const ByteGraph::FeatureType feat_type) {
-    LOG(INFO) << "[Server printf] GetNodeFeature";
+    DLOG(INFO) << "[Server printf] GetBatchNodeFeature";
     _return.resize(nodes.size());
     for(int i = 0; i < nodes.size(); i++) {
         Byte::Feature feat = engine_->getNodeFeature(nodes[i], feat_type);
@@ -89,10 +104,18 @@ void GraphServicesHandler::GetNodeFeature(std::vector<ByteGraph::NodeFeature>& _
     }
 }
 
-void GraphServicesHandler::GetNodeNeighbors(std::vector<ByteGraph::Neighbor>& _return, 
+void GraphServicesHandler::GetNodeNeighbors(ByteGraph::Neighbor& _return, 
+                                            const ByteGraph::NodeId node,
+                                            const ByteGraph::EdgeType edge_type) {
+    DLOG(INFO) << "[Server printf] GetNodeNeighbors";
+    Byte::NodeList neighbors = engine_->getNodeNeighbors(node, edge_type);
+    _return.assign(neighbors.data, neighbors.data + neighbors.sz);
+}
+
+void GraphServicesHandler::GetBatchNodeNeighbors(std::vector<ByteGraph::Neighbor>& _return, 
                                             const std::vector<ByteGraph::NodeId>& nodes, 
                                             const ByteGraph::EdgeType edge_type) {
-    LOG(INFO) << "[Server printf] GetNodeNeighbors";
+    DLOG(INFO) << "[Server printf] GetBatchNodeNeighbors";
     _return.resize(nodes.size());
     for(int idx = 0; idx < nodes.size(); idx++) {
         Byte::NodeID node_id = nodes[idx];
@@ -105,14 +128,14 @@ void GraphServicesHandler::GetNeighborsWithFeature(std::vector<ByteGraph::IDFeat
                                                    const ByteGraph::NodeId node_id,
                                                    const ByteGraph::EdgeType edge_type,
                                                    const ByteGraph::FeatureType feat_type) {
-    LOG(INFO) << "[Server printf] GetNeighborsWithFeature";
+    DLOG(INFO) << "[Server printf] GetNeighborsWithFeature";
 }
 
 void GraphServicesHandler::GetNodeWeights(std::vector<int32_t>& _return, 
                                           const std::vector<ByteGraph::NodeId>& nodes, 
                                           const ByteGraph::FeatureType feat_type,
                                           const int32_t feat_idx) {
-    LOG(INFO) << "[Server printf] GetNodeWeights";
+    DLOG(INFO) << "[Server printf] GetNodeWeights";
     _return.resize(nodes.size());
     for(int idx = 0; idx < nodes.size(); idx++) {
         _return[idx] = engine_->getNodeFeatureItem(nodes[idx], feat_type, feat_idx);
@@ -123,7 +146,7 @@ void GraphServicesHandler::SampleNodeNeighbors(std::vector<std::vector<ByteGraph
                                           const std::vector<ByteGraph::NodeId>& nodes, 
                                           const ByteGraph::EdgeType edge_type,
                                           const int32_t sample_num) {
-    LOG(INFO) << "[Server printf] SampleNeighbor";
+    DLOG(INFO) << "[Server printf] SampleNeighbor";
     _return.resize(nodes.size());
     for(int idx = 0; idx < nodes.size(); idx++) {
         Byte::NodeID node_id = nodes[idx];
@@ -133,5 +156,5 @@ void GraphServicesHandler::SampleNodeNeighbors(std::vector<std::vector<ByteGraph
 
 void GraphServicesHandler::RandomWalk(std::vector<ByteGraph::NodeId>& _return, const int32_t batch_size, const int32_t walk_len) {
     // Your implementation goes here
-    LOG(INFO) << "[Server printf] RandomWalk";
+    DLOG(INFO) << "[Server printf] RandomWalk";
 }

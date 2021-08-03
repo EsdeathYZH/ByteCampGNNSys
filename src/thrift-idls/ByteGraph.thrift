@@ -51,9 +51,11 @@ service GraphServices {
     // 全局采样一个Batch的Paper类型点
     BatchNodes SampleBatchNodes(1:NodeType type, 2:i32 batch_size, 3:SampleStrategy strategy)
     // 获取指定点特征
-    NodesFeature GetNodeFeature(1:list<NodeId> nodes, 2:FeatureType feat_type)
+    NodeFeature GetNodeFeature(1:NodeId node, 2:FeatureType feat_type)
+    NodesFeature GetBatchNodeFeature(1:list<NodeId> nodes, 2:FeatureType feat_type)
     // 获取指定点邻居
-    list<Neighbor> GetNodeNeighbors(1:list<NodeId> nodes, 2:EdgeType edge_type)
+    Neighbor GetNodeNeighbors(1:NodeId node, 2:EdgeType edge_type)
+    list<Neighbor> GetBatchNodeNeighbors(1:list<NodeId> nodes, 2:EdgeType edge_type)
     // 指定Author ID，拉取其P类型(边类型）的一跳邻居并返回特征（P为参数)
     list<IDFeaturePair> GetNeighborsWithFeature(1:NodeId node_id, 2:EdgeType edge_type, 3:FeatureType feat_type)
     // 获取指定点权重
