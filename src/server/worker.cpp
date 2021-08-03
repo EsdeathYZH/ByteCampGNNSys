@@ -1,12 +1,11 @@
-#include <glog/logging.h>
 #include "worker.h"
+
+#include <glog/logging.h>
 
 #include <iostream>
 
-static void
-usage(char *fn)
-{
-    std::cout << "usage: " << fn << " <partition_idx> [options]" << std::endl;
+static void usage(char* fn) {
+    std::cout << "usage: " << fn << " <partition_idx> <port> [options]" << std::endl;
     std::cout << "options:" << std::endl;
 }
 
@@ -15,29 +14,37 @@ int main(int argc, char** argv) {
     google::InitGoogleLogging(argv[0]);
     google::SetLogDestination(google::INFO, "/tmp/log/INFO_");
 
-    if (argc < 2) {
+    if (argc < 3) {
         usage(argv[0]);
         exit(EXIT_FAILURE);
     }
 
     int worker_idx = std::atoi(argv[1]);
+    int port = std::atoi(argv[2]);
     std::cout << "[Server cout] hello worker" << worker_idx << "\n";
-    int port = 9090;
+    // int port = 2021;
     ::std::shared_ptr<Byte::Graph> graph = std::make_shared<Byte::Graph>(worker_idx, "/data");
     ::std::shared_ptr<Byte::GraphEngine> engine(new Byte::GraphEngine(graph));
     ::std::shared_ptr<GraphServicesHandler> handler(new GraphServicesHandler(engine));
     ::std::shared_ptr<at::server::TProcessor> processor(new ByteGraph::GraphServicesProcessor(handler));
 
-    ::std::shared_ptr<att::TNonblockingServerSocket> serverTransport(new att::TNonblockingServerSocket(port));
+    ::std::shared_ptr<att::TServerSocket> serverTransport(new att::TServerSocket(port));
+    ::std::shared_ptr<att::TBufferedTransportFactory> transportFactory(new att::TBufferedTransportFactory());
     ::std::shared_ptr<atp::TProtocolFactory> protocolFactory(new atp::TBinaryProtocolFactory());
 
-    at::server::TNonblockingServer server(processor, protocolFactory, serverTransport);
+    ::std::shared_ptr<at::server::ThreadManager> threadManager = at::server::ThreadManager::newSimpleThreadManager(32);
+    ::std::shared_ptr<at::server::ThreadFactory> threadFactory(new at::server::ThreadFactory());
+
+    threadManager->threadFactory(threadFactory);
+    threadManager->start();
+
+    // at::server::TSimpleServer server(processor, serverTransport, transportFactory, protocolFactory);
+    at::server::TThreadPoolServer server(processor, serverTransport, transportFactory, protocolFactory, threadManager);
     server.serve();
     return 0;
 }
 
-GraphServicesHandler::GraphServicesHandler(std::shared_ptr<Byte::GraphEngine> engine)
-    : engine_(engine) {}
+GraphServicesHandler::GraphServicesHandler(std::shared_ptr<Byte::GraphEngine> engine) : engine_(engine) {}
 
 void GraphServicesHandler::sayHello(std::string& _return, const int32_t workerId, const std::string& content) {
     DLOG(INFO) << "[Server printf] sayHello";
@@ -93,14 +100,14 @@ void GraphServicesHandler::GetBatchNodeFeature(std::vector<ByteGraph::NodeFeatur
                                           const ByteGraph::FeatureType feat_type) {
     DLOG(INFO) << "[Server printf] GetBatchNodeFeature";
     _return.resize(nodes.size());
-    for(int i = 0; i < nodes.size(); i++) {
+    for (int i = 0; i < nodes.size(); i++) {
         Byte::Feature feat = engine_->getNodeFeature(nodes[i], feat_type);
         _return[i].resize(feat.sz);
-        if(feat.stride == 1) {
+        if (feat.stride == 1) {
             memcpy(_return[i].data(), feat.data, feat.sz * sizeof(Byte::FeatureData));
         } else {
-            for(int j = 0; j < feat.sz; j++) {
-                memcpy(_return[i].data()+j, feat.data+feat.stride*j, sizeof(Byte::FeatureData));
+            for (int j = 0; j < feat.sz; j++) {
+                memcpy(_return[i].data() + j, feat.data + feat.stride * j, sizeof(Byte::FeatureData));
             }
         }
     }
@@ -126,9 +133,8 @@ void GraphServicesHandler::GetBatchNodeNeighbors(std::vector<ByteGraph::Neighbor
     }
 }
 
-void GraphServicesHandler::GetNeighborsWithFeature(std::vector<ByteGraph::IDFeaturePair>& _return, 
-                                                   const ByteGraph::NodeId node_id,
-                                                   const ByteGraph::EdgeType edge_type,
+void GraphServicesHandler::GetNeighborsWithFeature(std::vector<ByteGraph::IDFeaturePair>& _return,
+                                                   const ByteGraph::NodeId node_id, const ByteGraph::EdgeType edge_type,
                                                    const ByteGraph::FeatureType feat_type) {
     DLOG(INFO) << "[Server printf] GetNeighborsWithFeature";
 }
@@ -156,7 +162,8 @@ void GraphServicesHandler::SampleNodeNeighbors(std::vector<std::vector<ByteGraph
     }
 }
 
-void GraphServicesHandler::RandomWalk(std::vector<ByteGraph::NodeId>& _return, const int32_t batch_size, const int32_t walk_len) {
+void GraphServicesHandler::RandomWalk(std::vector<ByteGraph::NodeId>& _return, const int32_t batch_size,
+                                      const int32_t walk_len) {
     // Your implementation goes here
     DLOG(INFO) << "[Server printf] RandomWalk";
 }
