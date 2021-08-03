@@ -27,11 +27,14 @@ class ClientWithCache : public ClientBase {
                                  const ByteGraph::FeatureType& featureType,
                                  std::vector<ByteGraph::IDFeaturePair>& neighbors) override;
 
-    void SampleNeighbor(const int32_t& batchSize, const ByteGraph::NodeType& nodeType,
-                        const ByteGraph::NodeType& neighborType, const int32_t& sampleNum,
-                        std::vector<ByteGraph::IDNeighborPair>& neighbors) override;
+    void SampleNeighbor(const int32_t &batchSize, const ByteGraph::NodeType &nodeType,
+                        const ByteGraph::EdgeType &edgeType, const int32_t &sampleNum,
+                        const ByteGraph::SampleStrategy::type &sampleStrategy,
+                        std::vector<std::vector<ByteGraph::NodeId>> &neighbors) override;
 
-    void RandomWalk(const int32_t& batchSize, const int32_t& walkLen, std::vector<ByteGraph::NodeId>& nodes) override;
+    void RandomWalk(const int32_t& batchSize, const int32_t& walkLen,
+                    const ByteGraph::SampleStrategy::type &sampleStrategy,
+                    std::vector<std::vector<ByteGraph::NodeId>>& nodes) override;
 
    private:
     std::vector<std::shared_ptr<RpcClient>> rpc_clients_;

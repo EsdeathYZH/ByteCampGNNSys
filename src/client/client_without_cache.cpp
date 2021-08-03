@@ -40,7 +40,7 @@ void ClientWithoutCache::SampleBatchNodes(const ByteGraph::NodeType &type, const
     auto rpc_clients_batch_node_size = GetBatchSizeAccordingToWeights(servers_weight, batchSize);
     for (size_t i = 0; i < size; ++i) {
         ByteGraph::BatchNodes tmpBatchNodes;
-        rpc_clients_[i]->SampleBatchNodes(type, rpc_clients_batch_node_size[i], sampleStrategy, tmpBatchNodes);
+        rpc_clients_[i]->SampleBatchNodes(type, rpc_clients_batch_node_size[i], sampleStrategy, featureIndex, tmpBatchNodes);
         batchNodes.node_ids.insert(batchNodes.node_ids.end(), tmpBatchNodes.node_ids.begin(),
                                    tmpBatchNodes.node_ids.end());
     }
@@ -97,12 +97,30 @@ void ClientWithoutCache::GetNeighborsWithFeature(const ByteGraph::NodeId &nodeId
 }
 
 void ClientWithoutCache::SampleNeighbor(const int32_t &batchSize, const ByteGraph::NodeType &nodeType,
-                                        const ByteGraph::NodeType &neighborType, const int32_t &sampleNum,
-                                        std::vector<ByteGraph::IDNeighborPair> &neighbors) {
-    //    rpc_client_->SampleNeighbor(batchSize, nodeType, neighborType, sampleNum, neighbors);
+                                        const ByteGraph::EdgeType &edgeType, const int32_t &sampleNum,
+                                        const ByteGraph::SampleStrategy::type &sampleStrategy,
+                                        std::vector<std::vector<ByteGraph::NodeId>> &neighbors) {
+    // if(sampleStrategy == ByteGraph::SampleStrategy::type::RANDOM) {
+    //     ByteGraph::BatchNodes nodes;
+    //     SampleBatchNodes(nodeType, batchSize, ByteGraph::SampleStrategy::RANDOM, 0, nodes);
+    //     rpc_clients_->SampleNodeNeighbors(nodes.node_ids, edgeType, sampleNum, neighbors);
+    // } else if(sampleStrategy == ByteGraph::SampleStrategy::type::ITS) {
+    //     ByteGraph::BatchNodes nodes;
+    //     SampleBatchNodes(nodeType, batchSize, ByteGraph::SampleStrategy::RANDOM, 0, nodes);
+    //     std::vector<ByteGraph::Neighbor> neighbors;
+    //     rpc_clients_->GetBatchNodeNeighbors(nodes.node_ids, edgeType);
+    //     std::unordered_set<ByteGraph::NodeId> neigh_set;
+    //     for(auto neigh : neighbors) {
+    //         for(auto id : neigh) neigh_set.insert(id);
+    //     }
+    //     std::vector<ByteGraph::NodeId> unique_neigh_ids(std::begin(neigh_set), std::end(neigh_set));
+    //     rpc_client_->GetBatchNodeNeighbors(nodes.node_ids, edgeType);
+
+    // }
 }
 
-void ClientWithoutCache::RandomWalk(const int32_t &batchSize, const int32_t &walkLen,
-                                    std::vector<ByteGraph::NodeId> &nodes) {
+void ClientWithoutCache::RandomWalk(const int32_t& batchSize, const int32_t& walkLen,
+                            const ByteGraph::SampleStrategy::type &sampleStrategy,
+                            std::vector<std::vector<ByteGraph::NodeId>>& nodes) {
     //    rpc_client_->RandomWalk(batchSize, walkLen, nodes);
 }

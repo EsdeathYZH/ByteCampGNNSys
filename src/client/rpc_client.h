@@ -36,6 +36,7 @@ class RpcClient {
 
     void SampleBatchNodes(const ByteGraph::NodeType& type, const int32_t& batchSize,
                           const ByteGraph::SampleStrategy::type& sampleStrategy,
+                          const int32_t feat_idx,
                           ByteGraph::BatchNodes& batchNodes);
 
     void GetNodeFeature(const ByteGraph::NodeId& nodeId, const ByteGraph::FeatureType& featureType,

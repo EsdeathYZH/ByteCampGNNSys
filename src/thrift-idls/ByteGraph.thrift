@@ -11,7 +11,7 @@ typedef list<NodeFeature> NodesFeature
 // 获取全图信息
 struct GraphInfo {
     1:list<i32> infos_;
-    2:list<i32> total_weights_;
+    2:list<i64> total_weights_;
 }
 
 // 全局采样一个Batch的Paper类型点
