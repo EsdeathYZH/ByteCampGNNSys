@@ -68,7 +68,7 @@ void ClientWithoutCache::GetNodeFeature(const std::vector<ByteGraph::NodeId> &no
     assert(index == nodes.size());
     for (size_t i = 0; i < rpc_client_size; ++i) {
         NodesFeature tmpNodesFeature;
-        rpc_clients_[i]->GetNodeFeature(rpc_clients_nodes[i], featureType, tmpNodesFeature);
+        rpc_clients_[i]->GetBatchNodeFeature(rpc_clients_nodes[i], featureType, tmpNodesFeature);
         assert(tmpNodesFeature.size() == rpc_clients_nodes[i].size());
         for (size_t j = 0; j < tmpNodesFeature.size(); ++j) {
             nodeFeature[nodeId2Index[rpc_clients_nodes[i][j]]] = std::move(tmpNodesFeature[j]);

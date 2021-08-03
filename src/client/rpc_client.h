@@ -38,8 +38,11 @@ class RpcClient {
                           const ByteGraph::SampleStrategy::type& sampleStrategy,
                           ByteGraph::BatchNodes& batchNodes);
 
-    void GetNodeFeature(const std::vector<ByteGraph::NodeId>& nodes, const ByteGraph::FeatureType& featureType,
-                        ByteGraph::NodesFeature& nodeFeature);
+    void GetNodeFeature(const ByteGraph::NodeId& nodeId, const ByteGraph::FeatureType& featureType,
+                        ByteGraph::NodeFeature& nodeFeature);
+
+    void GetBatchNodeFeature(const std::vector<ByteGraph::NodeId>& nodes, const ByteGraph::FeatureType& featureType,
+                             ByteGraph::NodesFeature& nodesFeature);
 
     void GetNodeNeighbors(const ByteGraph::NodeId& nodeId, const ByteGraph::EdgeType& edgeType, ByteGraph::Neighbor& neighborNodes);
 

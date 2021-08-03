@@ -32,9 +32,12 @@ void RpcClient::SampleBatchNodes(const ByteGraph::NodeType &type, const int32_t 
     rpc_client_->SampleBatchNodes(batchNodes, type, batchSize, sampleStrategy);
 }
 
-void RpcClient::GetNodeFeature(const std::vector<ByteGraph::NodeId> &nodes, const ByteGraph::FeatureType &featureType,
-                               ByteGraph::NodesFeature &nodeFeature) {
-    rpc_client_->GetNodeFeature(nodeFeature, nodes, featureType);
+void RpcClient::GetNodeFeature(const ByteGraph::NodeId &nodeId, const ByteGraph::FeatureType &featureType, ByteGraph::NodeFeature &nodeFeature){
+    rpc_client_->GetNodeFeature(nodeFeature, nodeId, featureType);
+}
+
+void RpcClient::GetBatchNodeFeature(const std::vector<ByteGraph::NodeId> &nodes, const ByteGraph::FeatureType &featureType, ByteGraph::NodesFeature &nodesFeature) {
+    rpc_client_->GetBatchNodeFeature(nodesFeature, nodes, featureType);
 }
 
 void RpcClient::GetNodeNeighbors(const ByteGraph::NodeId &nodeId, const ByteGraph::EdgeType &edgeType, ByteGraph::Neighbor &neighborNodes){
