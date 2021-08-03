@@ -60,13 +60,14 @@ void GraphServicesHandler::getFullGraphInfo(ByteGraph::GraphInfo& _return) {
 void GraphServicesHandler::SampleBatchNodes(ByteGraph::BatchNodes& _return, 
                                             const ByteGraph::NodeType type, 
                                             const int32_t batch_size,
-                                            const ByteGraph::SampleStrategy::type strategy) {
+                                            const ByteGraph::SampleStrategy::type strategy,
+                                            const int32_t feat_idx) {
     DLOG(INFO) << "[Server printf] SampleBatchNodes";
     if(strategy == ByteGraph::SampleStrategy::type::RANDOM) {
         auto nodes = engine_->sampleNodesFromRandom(type, batch_size);
         _return.node_ids.swap(nodes);
     } else {
-        auto nodes = engine_->sampleNodesFromWeight(type, batch_size);
+        auto nodes = engine_->sampleNodesFromWeight(type, batch_size, feat_idx);
         _return.node_ids.swap(nodes);
     }
 }

@@ -49,7 +49,7 @@ service GraphServices {
     // 获取全图信息
     GraphInfo getFullGraphInfo()
     // 全局采样一个Batch的Paper类型点
-    BatchNodes SampleBatchNodes(1:NodeType type, 2:i32 batch_size, 3:SampleStrategy strategy)
+    BatchNodes SampleBatchNodes(1:NodeType type, 2:i32 batch_size, 3:SampleStrategy strategy, 4:i32 feat_idx)
     // 获取指定点特征
     NodeFeature GetNodeFeature(1:NodeId node, 2:FeatureType feat_type)
     NodesFeature GetBatchNodeFeature(1:list<NodeId> nodes, 2:FeatureType feat_type)

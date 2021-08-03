@@ -6,6 +6,15 @@
 
 namespace Byte {
 
+#define PAPER 1
+#define AUTHOR 2
+#define INSTITUTION 3
+#define PAPER2PAPER 4
+#define AUTHOR2PAPER 5
+#define AUTHOR2INSTITUTION 6
+#define PAPER_FEATURE 7
+#define PAPER_LABEL 8
+
 using NodeID = int64_t;
 using NodeType = uint32_t;
 using EdgeType = uint32_t;

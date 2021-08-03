@@ -19,11 +19,11 @@ std::vector<NodeID> GraphEngine::sampleNodesFromRandom(NodeType node_type, int b
     return mini_batch;
 }
 
-std::vector<NodeID> GraphEngine::sampleNodesFromWeight(NodeType node_type, int batch_size) {
+std::vector<NodeID> GraphEngine::sampleNodesFromWeight(NodeType node_type, int batch_size, int feat_idx) {
     std::vector<NodeID> mini_batch;
     mini_batch.reserve(batch_size);
     NodeList nodes = graph_->getNodes(node_type);
-    WeightList weights = graph_->getNodeWeights(node_type, 0, 0); // FIXME: hard code
+    WeightList weights = graph_->getNodeWeights(node_type, PAPER_FEATURE, feat_idx); // FIXME: hard code
     ITSSampling its_table(weights);
     for(int i = 0; i < batch_size; i++) {
         mini_batch.push_back(its_table.sample());

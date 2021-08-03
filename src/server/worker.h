@@ -23,7 +23,8 @@ class GraphServicesHandler : virtual public ByteGraph::GraphServicesIf {
     void SampleBatchNodes(ByteGraph::BatchNodes& _return, 
                           const ByteGraph::NodeType type, 
                           const int32_t batch_size,
-                          const ByteGraph::SampleStrategy::type strategy);
+                          const ByteGraph::SampleStrategy::type strategy,
+                          const int32_t feat_idx);
 
     void GetNodeFeature(ByteGraph::NodeFeature& _return, 
                         const ByteGraph::NodeId node, 

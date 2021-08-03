@@ -21,7 +21,7 @@ public:
     GraphMeta getGraphInfo();
     // used by 2nd & 3rd request type
     std::vector<NodeID> sampleNodesFromRandom(NodeType node_type, int batch_size);
-    std::vector<NodeID> sampleNodesFromWeight(NodeType node_type, int batch_size);
+    std::vector<NodeID> sampleNodesFromWeight(NodeType node_type, int batch_size, int feat_idx);
     // used by 4th & 5th request type
     Feature getNodeFeature(NodeID node_id, FeatureType feat_type);
     // used by 5th request type
