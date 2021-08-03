@@ -5,7 +5,7 @@
 #include <iostream>
 
 static void usage(char* fn) {
-    std::cout << "usage: " << fn << " <partition_idx> <port> [options]" << std::endl;
+    std::cout << "usage: " << fn << " <partition_idx> <port> <thread_num> [options]" << std::endl;
     std::cout << "options:" << std::endl;
 }
 
@@ -14,13 +14,14 @@ int main(int argc, char** argv) {
     google::InitGoogleLogging(argv[0]);
     google::SetLogDestination(google::INFO, "/tmp/log/INFO_");
 
-    if (argc < 3) {
+    if (argc < 4) {
         usage(argv[0]);
         exit(EXIT_FAILURE);
     }
 
     int worker_idx = std::atoi(argv[1]);
     int port = std::atoi(argv[2]);
+    int thread_nums = std::atoi(argv[3]);
     std::cout << "[Server cout] hello worker" << worker_idx << "\n";
     // int port = 2021;
     ::std::shared_ptr<Byte::Graph> graph = std::make_shared<Byte::Graph>(worker_idx, "/data");
@@ -32,7 +33,7 @@ int main(int argc, char** argv) {
     ::std::shared_ptr<att::TBufferedTransportFactory> transportFactory(new att::TBufferedTransportFactory());
     ::std::shared_ptr<atp::TProtocolFactory> protocolFactory(new atp::TBinaryProtocolFactory());
 
-    ::std::shared_ptr<at::server::ThreadManager> threadManager = at::server::ThreadManager::newSimpleThreadManager(32);
+    ::std::shared_ptr<at::server::ThreadManager> threadManager = at::server::ThreadManager::newSimpleThreadManager(thread_nums);
     ::std::shared_ptr<at::server::ThreadFactory> threadFactory(new at::server::ThreadFactory());
 
     threadManager->threadFactory(threadFactory);
