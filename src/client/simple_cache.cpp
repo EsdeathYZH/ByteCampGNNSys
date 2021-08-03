@@ -29,28 +29,25 @@ std::shared_ptr<ByteGraph::Neighbor> SimpleCache::GetNeighbors(const ByteGraph::
 
 void SimpleCache::PutFullGraphInfo(const ByteGraph::GraphInfo &graphInfo) {
     graph_info_ = std::make_shared<ByteGraph::GraphInfo>(graphInfo);
-    graph_info_.reset();
 }
 
 void SimpleCache::PutNodeFeature(const ByteGraph::NodeId &nodeId, const ByteGraph::NodeFeature &nodeFeature) {
-    if (node_feature_cache_.count(nodeId)) {
-        assert(usage_ >= (node_feature_cache_[nodeId]->size() * sizeof(int32_t)));
-        usage_ -= node_feature_cache_[nodeId]->size() * sizeof(int32_t);
+    assert(node_feature_cache_.size() <= node_feature_cache_upper_num_);
+    if (node_feature_cache_.size() == node_feature_cache_upper_num_) {
+        // just pick the first element for deleting
+        node_feature_cache_.erase(node_feature_cache_.begin());
     }
-    // todo add capacity limit
     node_feature_cache_[nodeId] = std::make_shared<NodeFeature>(nodeFeature);
-    usage_ += node_feature_cache_[nodeId]->size() * sizeof(int32_t);
 }
 
 void SimpleCache::PutNodeNeighbors(const ByteGraph::NodeId &nodeId, const ByteGraph::EdgeType &edgeType,
                                    const ByteGraph::Neighbor &neighborNodes) {
-    if (node_neighbors_cache_.count(nodeId) && node_neighbors_cache_[nodeId].count(edgeType)) {
-        assert(usage_ >= node_neighbors_cache_[nodeId][edgeType]->size() * sizeof(nodeId));
-        usage_ -= node_neighbors_cache_[nodeId][edgeType]->size() * sizeof(nodeId);
+    assert(node_neighbors_cache_.size() <= node_neighbors_cache_upper_num_);
+    if (node_neighbors_cache_.size() == node_neighbors_cache_upper_num_) {
+        // just pick the first element for deleting
+        node_neighbors_cache_.erase(node_neighbors_cache_.begin());
     }
-  // todo add capacity limit
-  node_neighbors_cache_[nodeId][edgeType] = std::make_shared<Neighbor>(neighborNodes);
-    usage_ += node_neighbors_cache_[nodeId][edgeType]->size() * sizeof(nodeId);
+    node_neighbors_cache_[nodeId][edgeType] = std::make_shared<Neighbor>(neighborNodes);
 }
 
 void SimpleCache::DelFullGraphInfo() { graph_info_.reset(); }
@@ -65,5 +62,5 @@ void SimpleCache::DelNodeNeighbors(const ByteGraph::NodeId &nodeId, const ByteGr
 }
 
 std::shared_ptr<Cache> NewSimpleCache(size_t capacity) {
-  return std::static_pointer_cast<Cache>(std::make_shared<SimpleCache>(capacity));
+    return std::static_pointer_cast<Cache>(std::make_shared<SimpleCache>(capacity));
 }
