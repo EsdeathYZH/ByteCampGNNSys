@@ -1,3 +1,5 @@
+#include <glog/logging.h>
+#include <omp.h>
 #include "worker.h"
 
 #include <glog/logging.h>

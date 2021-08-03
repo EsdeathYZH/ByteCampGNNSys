@@ -228,9 +228,11 @@ void Graph::load_paper_feature(std::string file_path) {
     feature_map_[PAPER_FEATURE] = std::unordered_map<NodeID, uint64_t>();
     feature_map_[PAPER_FEATURE].reserve(paper_num);
     feature_data_[PAPER_FEATURE] = std::vector<FeatureData>(paper_num * feat_meta.feature_dim);
+    for(uint64_t i = 0; i < paper_num; i++) {
+        feature_map_[PAPER_FEATURE][node_ids[PAPER][i]] = i;
+    }
     #pragma omp parallel for num_threads(64)
     for(uint64_t i = 0; i < paper_num; i++) { // generate papers' feature
-        feature_map_[PAPER_FEATURE][node_ids[PAPER][i]] = i;
         for(uint64_t idx = i * feat_meta.feature_dim; idx < (i+1) * feat_meta.feature_dim; idx++) {
             feature_data_[PAPER_FEATURE][idx] = i % 2 + 0.14159;
         }
