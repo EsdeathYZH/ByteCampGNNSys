@@ -1,4 +1,5 @@
 #include <fstream>
+#include <algorithm>
 #include "graph/graph.h"
 
 namespace Byte {
@@ -42,14 +43,14 @@ Feature Graph::getFeatureData(NodeID node_id, FeatureType feat_type) {
     return result;
 }
 
-FeatureData Graph::getFeatureItem(NodeID node_id, FeatureType feat_type, uint32_t idx) {
+FeatureData Graph::getFeatureItem(NodeID node_id, FeatureType feat_type, int32_t idx) {
     FeatureTypeMeta meta = this->getFeatureTypeMeta(feat_type);
     uint32_t feat_dim = meta.feature_dim;
     uint32_t index = feature_map_[feat_type][node_id];
     return feature_data_[feat_type][index * feat_dim + idx];
 }
 
-WeightList Graph::getNodeWeights(NodeType node_type, FeatureType feat_type, uint32_t idx) {
+WeightList Graph::getNodeWeights(NodeType node_type, FeatureType feat_type, int32_t idx) {
     WeightList result;
     FeatureTypeMeta meta = this->getFeatureTypeMeta(feat_type);
     uint32_t feat_dim = meta.feature_dim;
@@ -115,9 +116,9 @@ void Graph::load(std::string data_dir) {
     load_paper_nodes();
     load_author_nodes();
     load_institution_nodes();
-    // load_paper2paper_edges(path);
-    // load_author2paper_edges(path);
-    // load_author2institution_edges(path);
+    load_paper2paper_edges(path);
+    load_author2paper_edges(path);
+    load_author2institution_edges(path);
     load_paper_label(path + "/paper_label.txt");
     load_paper_feature(path + "/paper_feature.txt");
 }
@@ -181,6 +182,8 @@ void Graph::load_edges(EdgeType edge_type, std::string file_path) {
     std::ifstream edge_file(file_path);
     NodeID src_id, dst_id, cur_id = 0;
     size_t prev_idx = 0, cur_idx = 0;
+    std::vector<std::pair<NodeID, int>> degree_vec;
+    degree_vec.reserve(src_meta.local_num);
     // we assume edges have been sorted by source id
     while(edge_file >> src_id >> dst_id) {
         // new src
@@ -188,6 +191,7 @@ void Graph::load_edges(EdgeType edge_type, std::string file_path) {
             NeighborList neigh_list;
             neigh_list.index = prev_idx;
             neigh_list.sz = cur_idx - prev_idx;
+            degree_vec.push_back(std::pair<NodeID, int>(cur_id, neigh_list.sz));
             edge_map_[edge_type][cur_id] = neigh_list;
             prev_idx = cur_idx;
             cur_id = src_id;
@@ -199,6 +203,18 @@ void Graph::load_edges(EdgeType edge_type, std::string file_path) {
                       << " edges, edge type:" << edge_type << std::endl;
         }
     }
+
+    // generate degree file
+    // std::ofstream degree_file("/data/"+ std::to_string(partition_id)+"/paper2paper_degree.txt");
+    // std::sort(std::begin(degree_vec), std::end(degree_vec),
+    //         [](std::pair<NodeID, int>& left, std::pair<NodeID, int>& right){ 
+    //             return left.second > right.second; 
+    //         });
+    // for(auto& pair : degree_vec) {
+    //     degree_file << pair.first << " " << pair.second << "\n";
+    // }
+    // degree_file.close();
+    
     edge_type_meta_[edge_type].local_num = cur_idx;
     std::cout << "edge type " << edge_type << " local num:" << cur_idx 
               << " src num:" << edge_map_[edge_type].size() << std::endl;
@@ -207,14 +223,25 @@ void Graph::load_edges(EdgeType edge_type, std::string file_path) {
 
 void Graph::load_paper_feature(std::string file_path) {
     // TODO: use real feature data
+    uint64_t paper_num = 300;
     FeatureTypeMeta feat_meta = feature_type_meta_[PAPER_FEATURE];
     feature_map_[PAPER_FEATURE] = std::unordered_map<NodeID, uint32_t>();
-    feature_data_[PAPER_FEATURE] = std::vector<FeatureData>(300 * feat_meta.feature_dim);
-    for(int i = 0; i < 300; i++) { // generate 300 papers' feature
+    feature_data_[PAPER_FEATURE] = std::vector<FeatureData>(paper_num * feat_meta.feature_dim);
+    for(int i = 0; i < paper_num; i++) { // generate papers' feature
         feature_map_[PAPER_FEATURE][node_ids[PAPER][i]] = i;
         for(int idx = i * feat_meta.feature_dim; idx < (i+1) * feat_meta.feature_dim; idx++) {
             feature_data_[PAPER_FEATURE][idx] = i + 3.14159;
         }
+    }
+
+    graph_meta_.sum_weights.resize(graph_meta_.paper_feat_dim);
+    #pragma omp parallel for num_threads(64)
+    for (int idx = 0; idx < graph_meta_.paper_feat_dim; idx++) {
+        float sum_weight = 0;
+        for(int i = 0; i < paper_num; i++) {
+            sum_weight += feature_data_[PAPER_FEATURE][i*graph_meta_.paper_feat_dim+idx];
+        }
+        graph_meta_.sum_weights[idx] = sum_weight;
     }
 }
 

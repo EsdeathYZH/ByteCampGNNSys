@@ -38,7 +38,7 @@ void RpcClient::GetNodeFeature(const std::vector<ByteGraph::NodeId> &nodes, cons
 }
 
 void RpcClient::GetNodeNeighbors(const ByteGraph::NodeId &nodeId, const ByteGraph::EdgeType &edgeType, ByteGraph::Neighbor &neighborNodes){
-    rpc_client_->GetNodeNeighbors(neighborNodes, nodeId, edgeType);
+    //rpc_client_->GetNodeNeighbors(neighborNodes, nodeId, edgeType);
 }
 
 void RpcClient::GetNeighborsWithFeature(const ByteGraph::NodeId &nodeId, const ByteGraph::EdgeType &neighborType,
@@ -50,9 +50,11 @@ void RpcClient::GetNeighborsWithFeature(const ByteGraph::NodeId &nodeId, const B
 void RpcClient::SampleNeighbor(const int32_t &batchSize, const ByteGraph::NodeType &nodeType,
                                const ByteGraph::NodeType &neighborType, const int32_t &sampleNum,
                                std::vector<ByteGraph::IDNeighborPair> &neighbors) {
-    rpc_client_->SampleNeighbor(neighbors, batchSize, nodeType, neighborType, sampleNum);
+    // TODO(wenjing)
+    //rpc_client_->SampleNodeNeighbors(neighbors, batchSize, nodeType, neighborType, sampleNum, ByteGraph::SampleStrategy::type::RANDOM);
 }
 
 void RpcClient::RandomWalk(const int32_t &batchSize, const int32_t &walkLen, std::vector<ByteGraph::NodeId> &nodes) {
-    rpc_client_->RandomWalk(nodes, batchSize, walkLen);
+    // TODO(zihang)
+    //rpc_client_->RandomWalk(nodes, batchSize, walkLen);
 }

@@ -25,9 +25,10 @@ public:
     // used by 4th & 5th request type
     Feature getNodeFeature(NodeID node_id, FeatureType feat_type);
     // used by 5th request type
+    FeatureData getNodeFeatureItem(NodeID node_id, FeatureType feat_type, int32_t feat_idx);
     NodeList getNodeNeighbors(NodeID node_id, EdgeType edge_type);
     // used by 6th request type
-    std::vector<NodeID> sampleNodeNeighbors(NodeID node_id, EdgeType edge_type, int neigh_num);
+    std::vector<NodeID> sampleNodeNeighborsFromRandom(NodeID node_id, EdgeType edge_type, int neigh_num);
     // used by 7th request type
     std::vector<NodeID> randomWalk(NodeID root_node, EdgeType edge_type, int walk_len);
 private:
