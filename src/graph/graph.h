@@ -42,7 +42,7 @@ private:
 
     // feature data
     FeatureStorageType feat_store_type = FeatureStorageType::ROW_STORE;
-    std::unordered_map<FeatureType, std::unordered_map<NodeID, uint32_t>> feature_map_;
+    std::unordered_map<FeatureType, std::unordered_map<NodeID, uint64_t>> feature_map_;
     std::unordered_map<FeatureType, std::vector<FeatureData>> feature_data_;
 
     // label data

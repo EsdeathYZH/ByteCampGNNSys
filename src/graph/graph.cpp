@@ -116,9 +116,9 @@ void Graph::load(std::string data_dir) {
     load_paper_nodes();
     load_author_nodes();
     load_institution_nodes();
-    load_paper2paper_edges(path);
-    load_author2paper_edges(path);
-    load_author2institution_edges(path);
+    // load_paper2paper_edges(path);
+    // load_author2paper_edges(path);
+    // load_author2institution_edges(path);
     load_paper_label(path + "/paper_label.txt");
     load_paper_feature(path + "/paper_feature.txt");
 }
@@ -225,7 +225,8 @@ void Graph::load_paper_feature(std::string file_path) {
     // TODO: use real feature data
     uint64_t paper_num = node_ids[PAPER].size();
     FeatureTypeMeta feat_meta = feature_type_meta_[PAPER_FEATURE];
-    feature_map_[PAPER_FEATURE] = std::unordered_map<NodeID, uint32_t>();
+    feature_map_[PAPER_FEATURE] = std::unordered_map<NodeID, uint64_t>();
+    feature_map_[PAPER_FEATURE].reserve(paper_num);
     feature_data_[PAPER_FEATURE] = std::vector<FeatureData>(paper_num * feat_meta.feature_dim);
     #pragma omp parallel for num_threads(64)
     for(uint64_t i = 0; i < paper_num; i++) { // generate papers' feature
