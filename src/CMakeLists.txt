@@ -59,3 +59,30 @@ target_link_libraries(GraphServer
         PUBLIC glog::glog
         PRIVATE ${THRIFT_LIBRARIES} ${NONBLOCKING_LIBS}
         )
+
+set(BENCHTEST_SRC
+        client/client_base.h
+        client/cache_base.h
+        client/rpc_client.h
+        client/rpc_client.cpp
+        client/client_without_cache.h
+        client/client_without_cache.cpp
+        client/client_with_cache.h
+        client/client_with_cache.cpp
+        client/simple_cache.h
+        client/simple_cache.cpp
+        benchtest.cpp
+        utils/random.h
+        utils/utils.h
+        ${THRIFT_SRC}
+        )
+
+add_executable(benchtest
+        # "${PROJECT_SOURCE_DIR}/src/server/worker.cpp"
+        ${BENCHTEST_SRC}
+        )
+
+target_link_libraries(benchtest
+        PUBLIC glog::glog
+        PRIVATE ${THRIFT_LIBRARIES} ${NONBLOCKING_LIBS}
+        )
