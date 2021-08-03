@@ -18,7 +18,8 @@ int main(int argc, char **argv) {
 
     string peerIP = "127.0.0.1";
     int port = 9090;
-    auto client = std::make_shared<ClientWithoutCache>(peerIP, port);
+    std::vector<std::pair<string, int>> servers{std::make_pair(peerIP, port)};
+    auto client = std::make_shared<ClientWithoutCache>(servers);
 
     GraphInfo graphInfo;
     client->GetFullGraphInfo(graphInfo);

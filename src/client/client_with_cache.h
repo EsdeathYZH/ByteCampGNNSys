@@ -2,6 +2,7 @@
 #define BYTEGRAPH_CLIENT_WITH_CACHE_H
 
 #include "client_base.h"
+#include <vector>
 
 namespace ByteCamp {
 
@@ -10,7 +11,7 @@ class Cache;
 class RpcClient;
 
 class ClientWithCache : public ClientBase {
-    ClientWithCache(std::string peerIP, int port, std::shared_ptr<Cache> cache);
+    ClientWithCache(const std::vector<std::pair<std::string, int>> &serverAddresses, std::shared_ptr<Cache> cache);
 
     void GetFullGraphInfo(ByteGraph::GraphInfo& graphInfo) override;
 
@@ -32,7 +33,8 @@ class ClientWithCache : public ClientBase {
     void RandomWalk(const int32_t& batchSize, const int32_t& walkLen, std::vector<ByteGraph::NodeId>& nodes) override;
 
    private:
-    std::shared_ptr<RpcClient> rpc_client_;
+    std::vector<std::shared_ptr<RpcClient>> rpc_clients_;
+    std::vector<double> server_weights_;
     std::shared_ptr<Cache> cache_;
 };
 
