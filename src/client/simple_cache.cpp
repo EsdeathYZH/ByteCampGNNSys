@@ -3,6 +3,8 @@
 using namespace ByteCamp;
 using namespace ByteGraph;
 
+namespace ByteCamp {
+
 std::shared_ptr<ByteGraph::GraphInfo> SimpleCache::GetFullGraphInfo() { return graph_info_; }
 
 std::vector<std::shared_ptr<ByteGraph::NodeFeature>> SimpleCache::GetNodeFeature(
@@ -63,4 +65,6 @@ void SimpleCache::DelNodeNeighbors(const ByteGraph::NodeId &nodeId, const ByteGr
 
 std::shared_ptr<Cache> NewSimpleCache(size_t capacity) {
     return std::static_pointer_cast<Cache>(std::make_shared<SimpleCache>(capacity));
+}
+
 }
