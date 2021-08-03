@@ -41,7 +41,7 @@ void RpcClient::GetBatchNodeFeature(const std::vector<ByteGraph::NodeId> &nodes,
 }
 
 void RpcClient::GetNodeNeighbors(const ByteGraph::NodeId &nodeId, const ByteGraph::EdgeType &edgeType, ByteGraph::Neighbor &neighborNodes){
-    //rpc_client_->GetNodeNeighbors(neighborNodes, nodeId, edgeType);
+    rpc_client_->GetNodeNeighbors(neighborNodes, nodeId, edgeType);
 }
 
 void RpcClient::GetNeighborsWithFeature(const ByteGraph::NodeId &nodeId, const ByteGraph::EdgeType &neighborType,

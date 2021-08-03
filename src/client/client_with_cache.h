@@ -17,6 +17,7 @@ class ClientWithCache : public ClientBase {
 
     void SampleBatchNodes(const ByteGraph::NodeType& type, const int32_t& batchSize,
                           const ByteGraph::SampleStrategy::type& sampleStrategy,
+                          const int32_t &featureIndex,
                           ByteGraph::BatchNodes& batchNodes) override;
 
     void GetNodeFeature(const std::vector<ByteGraph::NodeId>& nodes, const ByteGraph::FeatureType& featureId,
@@ -34,7 +35,7 @@ class ClientWithCache : public ClientBase {
 
    private:
     std::vector<std::shared_ptr<RpcClient>> rpc_clients_;
-    std::vector<double> server_weights_;
+    std::vector<std::vector<int64_t>> server_weights_;
     std::shared_ptr<Cache> cache_;
 };
 

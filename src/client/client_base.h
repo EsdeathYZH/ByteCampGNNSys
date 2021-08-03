@@ -15,6 +15,7 @@ class ClientBase {
 
     virtual void SampleBatchNodes(const ByteGraph::NodeType& type, const int32_t& batchSize,
                                   const ByteGraph::SampleStrategy::type& sampleStrategy,
+                                  const int32_t& featureIndex,
                                   ByteGraph::BatchNodes& batchNodes) = 0;
 
     virtual void GetNodeFeature(const std::vector<ByteGraph::NodeId>& nodes, const ByteGraph::FeatureType& featureId,
