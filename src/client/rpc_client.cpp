@@ -16,7 +16,7 @@ namespace att = ::apache::thrift::transport;
 
 RpcClient::RpcClient(const std::string &peerIP, int port)
     : socket_(std::make_shared<att::TSocket>(peerIP, port))
-    , transport_(std::static_pointer_cast<att::TTransport>(std::make_shared<att::TFramedTransport>(socket_)))
+    , transport_(std::static_pointer_cast<att::TBufferedTransport>(std::make_shared<att::TBufferedTransport>(socket_)))
     , protocol_(std::static_pointer_cast<atp::TProtocol>(std::make_shared<atp::TBinaryProtocol>(transport_)))
     , rpc_client_(std::make_shared<ByteGraph::GraphServicesClient>(protocol_)) {
     // open connection, may throw exception.

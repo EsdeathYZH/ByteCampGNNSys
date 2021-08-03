@@ -5,6 +5,12 @@
 #include <thrift/transport/TNonblockingServerSocket.h>
 #include <thrift/transport/TServerSocket.h>
 
+#include <thrift/concurrency/ThreadManager.h>
+#include <thrift/concurrency/ThreadFactory.h>
+
+#include <thrift/server/TThreadPoolServer.h>
+#include <thrift/server/TThreadedServer.h>
+
 #include "gen-cpp/GraphServices.h"
 #include "engine/graph_engine.h"
 
