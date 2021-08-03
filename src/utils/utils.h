@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <cmath>
 
 namespace ByteCamp {
 
@@ -19,7 +20,7 @@ inline std::vector<std::pair<T1, T2> > ReadConfig(const std::string& config_file
     return std::move(ret);
 }
 
-std::vector<int32_t> getWeight(const std::vector<int64_t>& weights, int32_t batchSize) {
+std::vector<int32_t> GetWeight(const std::vector<int64_t>& weights, int32_t batchSize) {
     uint64_t totalWeight = 0;
     for (auto i : weights) totalWeight += i;
     std::vector<int32_t> result(weights.size());
