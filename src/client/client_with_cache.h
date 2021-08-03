@@ -11,6 +11,7 @@ class Cache;
 class RpcClient;
 
 class ClientWithCache : public ClientBase {
+   public:
     ClientWithCache(const std::vector<std::pair<std::string, int>> &serverAddresses, std::shared_ptr<Cache> cache);
 
     void GetFullGraphInfo(ByteGraph::GraphInfo& graphInfo) override;
