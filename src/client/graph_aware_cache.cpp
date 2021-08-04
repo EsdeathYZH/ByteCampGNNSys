@@ -45,6 +45,7 @@ void GraphAwareCache::PutNodeFeature(const ByteGraph::NodeId &nodeId, const Byte
         node_feature_pq_.pop();
         node_feature_cache_.erase(delNodeId);
     }
+    node_feature_pq_.push(nodeId);
     node_feature_cache_[nodeId] = ptr;
 }
 
@@ -56,6 +57,7 @@ void GraphAwareCache::PutNodeNeighbors(const ByteGraph::NodeId &nodeId, const By
         node_neighbors_pq_.pop();
         node_neighbors_cache_.erase(delNodeId);
     }
+    node_neighbors_pq_.push(nodeId);
     node_neighbors_cache_[nodeId][edgeType] = std::make_shared<Neighbor>(neighborNodes);
 }
 

@@ -102,7 +102,6 @@ void ClientWithCache::GetNodeFeature(const std::vector<ByteGraph::NodeId> &nodes
             ++cnt;
         }
     }
-    LOG(INFO) << "cache hit:" << cnt << " times in " << nodes.size() << "total times";
     const auto rpc_clients_size = rpc_clients_.size();
     std::vector<std::vector<NodeId>> rpc_clients_nodes(rpc_clients_size);
     for (const auto &notInCacheNode : notInCacheNodes) {
