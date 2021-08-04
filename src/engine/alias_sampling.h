@@ -67,7 +67,7 @@ public:
 
   	int64_t sample() const {
 		int64_t column = nextLong(prob.size());
-		bool coinToss = ThreadLocalRandom() < prob[column];
+		bool coinToss = FastRandom::xorshf01() < prob[column];
 		return coinToss ? column : alias[column];
 	}
 
@@ -97,7 +97,7 @@ public:
 	std::vector<int> alias;
 
 	int64_t nextLong(int64_t n) const {
-		return floor(n * ThreadLocalRandom());
+		return floor(n * FastRandom::xorshf01());
 	}
 };
 
