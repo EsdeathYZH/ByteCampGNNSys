@@ -72,7 +72,8 @@ void ClientWithCache::GetNodeFeature(const std::vector<ByteGraph::NodeId> &nodes
     for (const auto &notInCacheNode : notInCacheNodes) {
         rpc_clients_nodes[notInCacheNode % size].push_back(notInCacheNode);
     }
-    for (size_t i = 0; i < size; ++i) {
+    const auto rpc_clients_size = rpc_clients_.size();
+    for (size_t i = 0; i < rpc_clients_size; ++i) {
         NodesFeature notInCacheNodesFeature;
         rpc_clients_[i]->GetBatchNodeFeature(rpc_clients_nodes[i], featureType, notInCacheNodesFeature);
         auto tmpSize = rpc_clients_nodes[i].size();
