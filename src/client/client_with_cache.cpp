@@ -80,7 +80,7 @@ void ClientWithCache::GetNodeFeature(const std::vector<ByteGraph::NodeId> &nodes
         assert(tmpSize == notInCacheNodesFeature.size());
         for (size_t j = 0; j < tmpSize; ++j) {
             // put node feature in cache
-            cache_->PutNodeFeature(rpc_clients_nodes[i][j], nodesFeature[j]);
+            cache_->PutNodeFeature(rpc_clients_nodes[i][j], notInCacheNodesFeature[j]);
         }
     }
     nodesFeaturePtr = cache_->GetNodeFeature(nodes);
