@@ -34,13 +34,13 @@ void SimpleCache::PutFullGraphInfo(const ByteGraph::GraphInfo &graphInfo) {
 }
 
 void SimpleCache::PutNodeFeature(const ByteGraph::NodeId &nodeId, const ByteGraph::NodeFeature &nodeFeature) {
+    static auto ptr = std::make_shared<NodeFeature>(768, 0);
     assert(node_feature_cache_.size() <= node_feature_cache_upper_num_);
     if (node_feature_cache_.size() == node_feature_cache_upper_num_) {
         // just pick the first element for deleting
-        LOG(INFO) << "hit cache upper limit:" << node_feature_cache_upper_num_;
         node_feature_cache_.erase(node_feature_cache_.begin());
     }
-    node_feature_cache_[nodeId] = std::make_shared<NodeFeature>(nodeFeature);
+    node_feature_cache_[nodeId] = ptr;
 }
 
 void SimpleCache::PutNodeNeighbors(const ByteGraph::NodeId &nodeId, const ByteGraph::EdgeType &edgeType,

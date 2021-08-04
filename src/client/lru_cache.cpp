@@ -34,6 +34,7 @@ void LRUCache::PutFullGraphInfo(const ByteGraph::GraphInfo &graphInfo) {
 }
 
 void LRUCache::PutNodeFeature(const ByteGraph::NodeId &nodeId, const ByteGraph::NodeFeature &nodeFeature) {
+    static auto ptr = std::make_shared<NodeFeature>(768, 0);
     if (node_feature_cache_.count(nodeId)) {
         TouchNodeFeature(nodeId);
     } else {
@@ -43,7 +44,7 @@ void LRUCache::PutNodeFeature(const ByteGraph::NodeId &nodeId, const ByteGraph::
         }
         node_feature_elements_.push_front(nodeId);
     }
-    node_feature_cache_[nodeId] = {std::make_shared<NodeFeature>(nodeFeature), node_feature_elements_.begin()};
+    node_feature_cache_[nodeId] = {ptr, node_feature_elements_.begin()};
 }
 
 void LRUCache::PutNodeNeighbors(const ByteGraph::NodeId &nodeId, const ByteGraph::EdgeType &edgeType,

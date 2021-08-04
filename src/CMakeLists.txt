@@ -69,6 +69,10 @@ set(BENCHTEST_SRC
         client/client_without_cache.cpp
         client/client_with_cache.h
         client/client_with_cache.cpp
+        client/lru_cache.h
+        client/lru_cache.cpp
+        client/graph_aware_cache.h
+        client/graph_aware_cache.cpp
         client/simple_cache.h
         client/simple_cache.cpp
         benchtest.cpp
