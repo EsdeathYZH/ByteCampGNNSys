@@ -5,11 +5,15 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <unordered_map>
+
+#include "gen-cpp/GraphServices.h"
+
 
 namespace ByteCamp {
 
 template <class T1, class T2>
-inline std::vector<std::pair<T1, T2> > ReadConfig(const std::string& config_file) {
+static inline std::vector<std::pair<T1, T2> > ReadConfig(const std::string& config_file) {
     T1 param1;
     T2 param2;
     std::vector<std::pair<T1, T2> > ret;
@@ -18,6 +22,17 @@ inline std::vector<std::pair<T1, T2> > ReadConfig(const std::string& config_file
         ret.emplace_back(std::move(param1), std::move(param2));
     }
     return std::move(ret);
+}
+
+static inline std::unordered_map<ByteGraph::NodeId, int32_t> ReadInDegree(const std::string& config_file) {
+    ByteGraph::NodeId param1;
+    int32_t param2;
+    std::unordered_map<ByteGraph::NodeId, int32_t> inDegree;
+    std::ifstream config(config_file);
+    while (config >> param1 >> param2) {
+        inDegree.emplace(std::move(param1), std::move(param2));
+    }
+    return std::move(inDegree);
 }
 
 static std::vector<int32_t> GetBatchSizeAccordingToWeights(const std::vector<int64_t>& weights, int32_t batchSize) {

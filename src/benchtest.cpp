@@ -7,7 +7,12 @@
 #include <thread>
 
 #include "client/client_without_cache.h"
+#include "client/client_with_cache.h"
 #include "../src/utils/utils.h"
+
+#include "client/graph_aware_cache.h"
+#include "client/lru_cache.h"
+#include "client/simple_cache.h"
 
 using std::string;
 using std::thread;
@@ -50,19 +55,72 @@ void test_SampleBatchNodes(const std::vector<std::pair<string, int>>& servers, c
     }
 }
 
-void test_GetNeighborsWithFeature(const std::vector<std::pair<string, int>>& servers, const NodeId& NODE_ID_MAX,
-                                  const EdgeType& NEIGHBOR_TYPE_MAX, const FeatureType& FEATURE_TYPE_MAX) {
-    auto client = std::make_shared<ClientWithoutCache>(servers);
+void test_SampleBatchNodesAndGetNodeFeature(const std::vector<std::pair<string, int>>& servers,
+                                            const std::shared_ptr<ByteCamp::Cache>& cache, const NodeId& NODE_ID_MAX,
+                                            const EdgeType& NEIGHBOR_TYPE_MAX, const FeatureType& FEATURE_TYPE_MAX) {
+    auto client = std::make_shared<ClientWithCache>(servers, cache);
 
-    std::vector<IDFeaturePair> neighbors;
+    BatchNodes batchNodes;
+    const int32_t featureIndex = 3;
 
     for (NodeId node_id = 0; node_id < NODE_ID_MAX; node_id++) {
         for (EdgeType edge_type = 0; edge_type < NEIGHBOR_TYPE_MAX; edge_type++) {
             for (FeatureType feature_type = 0; feature_type < FEATURE_TYPE_MAX; feature_type++) {
-                client->GetNeighborsWithFeature(node_id, edge_type, feature_type, neighbors);
+                client->SampleBatchNodes(NODE_TYPE, BATCH_SIZE, SampleStrategy::RANDOM, featureIndex, batchNodes);
+                std::vector<NodeFeature> nodeFeatures;
+                client->GetNodeFeature(batchNodes.node_ids, 7, nodeFeatures);
             }
         }
     }
+}
+
+// void test_GetNeighborsWithFeature(const std::vector<std::pair<string, int>>& servers, const NodeId& NODE_ID_MAX,
+//                                   const EdgeType& NEIGHBOR_TYPE_MAX, const FeatureType& FEATURE_TYPE_MAX) {
+//     auto client = std::make_shared<ClientWithoutCache>(servers);
+
+//     std::vector<IDFeaturePair> neighbors;
+
+//     for (NodeId node_id = 0; node_id < NODE_ID_MAX; node_id++) {
+//         for (EdgeType edge_type = 0; edge_type < NEIGHBOR_TYPE_MAX; edge_type++) {
+//             for (FeatureType feature_type = 0; feature_type < FEATURE_TYPE_MAX; feature_type++) {
+//                 client->GetNeighborsWithFeature(node_id, edge_type, feature_type, neighbors);
+//             }
+//         }
+//     }
+// }
+
+void test_GetNeighborsWithFeature(const std::vector<std::pair<string, int>>& servers, const NodeId& NODE_ID_MAX,
+                                  const EdgeType& NEIGHBOR_TYPE_MAX, const FeatureType& FEATURE_TYPE_MAX) {
+    // auto client = std::make_shared<ClientWithoutCache>(servers);
+    auto simpleCache = NewLRUCache(100 * (1ll << 30));
+    // auto simpleCache = NewSimpleCache(100 * (1ll << 30));
+
+    // auto inDegree = ReadInDegree("/data/sortedByIndegree_vertex_table.txt");
+    // LOG(INFO) << "ReadInDegree over!";
+    // auto simpleCache = NewGraphAwareCache(
+    //     100 * (1ll << 30), [&inDegree](NodeId x, NodeId y) -> bool { return inDegree[x] > inDegree[y]; });
+
+    auto client = std::make_shared<ClientWithCache>(servers, simpleCache);
+
+    std::vector<IDFeaturePair> neighbors;
+    BatchNodes batchNodes;
+    client->SampleBatchNodes(NODE_TYPE, NODE_ID_MAX, SampleStrategy::RANDOM, 0, batchNodes);
+    assert(batchNodes.node_ids.size() == NODE_ID_MAX);
+
+    int64_t start_t = get_wall_time();
+
+    for (FeatureType feature_type = 0; feature_type < FEATURE_TYPE_MAX; feature_type++) {
+        for (EdgeType edge_type = 0; edge_type < NEIGHBOR_TYPE_MAX; edge_type++) {
+            for (size_t index = 0; index < NODE_ID_MAX; index++) {
+                client->GetNeighborsWithFeature(batchNodes.node_ids[index], 4, 7, neighbors);
+            }
+        }
+    }
+
+    int64_t end_t = get_wall_time();
+
+    fprintf(stderr, "pure %lld times cost = %f ms, qps = %f\n", NODE_ID_MAX * NEIGHBOR_TYPE_MAX * FEATURE_TYPE_MAX,
+            (end_t - start_t) / 1000.0, NODE_ID_MAX * NEIGHBOR_TYPE_MAX * FEATURE_TYPE_MAX * 1000000.0 / (end_t - start_t));
 }
 
 int main(int argc, char** argv) {
@@ -72,17 +130,23 @@ int main(int argc, char** argv) {
     // google::SetStderrLogging(google::INFO);
     FLAGS_logtostderr = true;
 
-    if (argc < 6) {
-        printf("Usage: benchtest <node_id> <neighbor_type> <feature_type> <server_list> <thread_nums>");
+    if (argc < 4) {
+        printf("Usage: benchtest <server_list> <thread_nums> <retry_times> [optional: <node_id> <neighbor_type> <feature_type>]\n");
         return 0;
     }
 
-    const NodeId NODE_ID_MAX = (NodeId) atoll(argv[1]);
-    const EdgeType NEIGHBOR_TYPE_MAX = (EdgeType) atoll(argv[2]);
-    const FeatureType FEATURE_TYPE_MAX = (FeatureType) atoll(argv[3]);
-    const char* server_list_file = argv[4];
-    const int32_t thr_num = atoi(argv[5]);
-    int64_t retry_times = NODE_ID_MAX * NEIGHBOR_TYPE_MAX * FEATURE_TYPE_MAX * thr_num;
+    const char* server_list_file = argv[1];
+    const int32_t thr_num = atoi(argv[2]);
+    int64_t retry_times = atoll(argv[3]) * thr_num;
+    NodeId NODE_ID_MAX = (NodeId) atoll(argv[3]);
+
+    EdgeType NEIGHBOR_TYPE_MAX = 1;
+    FeatureType FEATURE_TYPE_MAX = 1;
+    if (argc == 6) {
+        NEIGHBOR_TYPE_MAX = (EdgeType) atoll(argv[4]);
+        FEATURE_TYPE_MAX = (FeatureType) atoll(argv[5]);
+        retry_times = NODE_ID_MAX * NEIGHBOR_TYPE_MAX * FEATURE_TYPE_MAX * thr_num;
+    }
 
     std::vector<std::pair<string, int>> servers = ReadConfig<string, int>(server_list_file);
     for (auto e : servers) {
@@ -121,7 +185,8 @@ int main(int argc, char** argv) {
     for (int i = 0; i < thr_num; ++i) {
         thrs.emplace_back(
             // thread(bind(test_GetNeighborsWithFeature, servers, NODE_ID_MAX, NEIGHBOR_TYPE_MAX, FEATURE_TYPE_MAX)));
-            thread(bind(test_SampleBatchNodes, servers, NODE_ID_MAX, NEIGHBOR_TYPE_MAX, FEATURE_TYPE_MAX)));
+            // thread(bind(test_SampleBatchNodesAndGetNodeFeature, servers, graphAwareCache, NODE_ID_MAX, NEIGHBOR_TYPE_MAX, FEATURE_TYPE_MAX)));
+            thread(bind(test_GetNeighborsWithFeature, servers, NODE_ID_MAX, NEIGHBOR_TYPE_MAX, FEATURE_TYPE_MAX)));
     }
     for (auto& th : thrs) {
         th.join();
@@ -130,7 +195,7 @@ int main(int argc, char** argv) {
     printf("benchtest end\n");
     int64_t end_t = get_wall_time();
 
-    fprintf(stderr, "test_GetNeighborsWithFeature %lld times cost = %f ms, qps = %f\n", retry_times,
+    fprintf(stderr, "test_SampleBatchNodesAndGetNodeFeature %lld times cost = %f ms, qps = %f\n", retry_times,
             (end_t - start_t) / 1000.0, retry_times * 1000000.0 / (end_t - start_t));
 
     // start_t = get_wall_time();

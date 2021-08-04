@@ -14,7 +14,7 @@
 
 namespace ByteCamp {
 
-std::shared_ptr<Cache> NewGraphAwareCache(size_t capacity);
+std::shared_ptr<Cache> NewGraphAwareCache(size_t capacity, std::function<bool(ByteGraph::NodeId, ByteGraph::NodeId)> cmp);
 
 class GraphAwareCache : public Cache {
    public:
