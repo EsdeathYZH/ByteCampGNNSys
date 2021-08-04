@@ -35,9 +35,9 @@ std::vector<NodeID> GraphEngine::sampleNodesFromWeight(NodeType node_type, int b
     // ITSSampling its_table(weights);
     for(int i = 0; i < batch_size; i++) {
         if(use_alias_) {
-            mini_batch.push_back(alias_table_->sample());
+            mini_batch.push_back(nodes.data[alias_table_->sample()]);
         } else {
-            mini_batch.push_back(its_table_->sample());
+            mini_batch.push_back(nodes.data[its_table_->sample()]);
         }
     }
     return mini_batch;
