@@ -7,7 +7,7 @@
 #include <iostream>
 
 static void usage(char* fn) {
-    std::cout << "usage: " << fn << " <partition_idx> <port> <thread_num> [options]" << std::endl;
+    std::cout << "usage: " << fn << " <partition_idx> <port> <thread_num> <use_alias> [options]" << std::endl;
     std::cout << "options:" << std::endl;
 }
 
@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
     google::InitGoogleLogging(argv[0]);
     google::SetLogDestination(google::INFO, "/tmp/log/INFO_");
 
-    if (argc < 4) {
+    if (argc < 5) {
         usage(argv[0]);
         exit(EXIT_FAILURE);
     }
@@ -24,10 +24,11 @@ int main(int argc, char** argv) {
     int worker_idx = std::atoi(argv[1]);
     int port = std::atoi(argv[2]);
     int thread_nums = std::atoi(argv[3]);
+    bool use_alias = std::atoi(argv[4]);
     std::cout << "[Server cout] hello worker" << worker_idx << "\n";
     // int port = 2021;
     ::std::shared_ptr<Byte::Graph> graph = std::make_shared<Byte::Graph>(worker_idx, "/data");
-    ::std::shared_ptr<Byte::GraphEngine> engine(new Byte::GraphEngine(graph));
+    ::std::shared_ptr<Byte::GraphEngine> engine(new Byte::GraphEngine(graph, use_alias));
     ::std::shared_ptr<GraphServicesHandler> handler(new GraphServicesHandler(engine));
     ::std::shared_ptr<at::server::TProcessor> processor(new ByteGraph::GraphServicesProcessor(handler));
 

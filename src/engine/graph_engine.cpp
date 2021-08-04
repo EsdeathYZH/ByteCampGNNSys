@@ -2,7 +2,12 @@
 
 namespace Byte {
 
-GraphEngine::GraphEngine(std::shared_ptr<Graph> graph) : graph_(graph) {}
+GraphEngine::GraphEngine(std::shared_ptr<Graph> graph, bool use_alias) 
+    : graph_(graph), use_alias_(use_alias) {
+    WeightList weights = graph_->getNodeWeights(PAPER, PAPER_FEATURE, 0); // FIXME: hard code
+    its_table_ = std::make_shared<ITSSampling>(weights);
+    alias_table_ = std::make_shared<ALIASSampling>(weights);
+}
 
 GraphMeta GraphEngine::getGraphInfo() {
     return graph_->getGraphMeta();
@@ -20,13 +25,20 @@ std::vector<NodeID> GraphEngine::sampleNodesFromRandom(NodeType node_type, int b
 }
 
 std::vector<NodeID> GraphEngine::sampleNodesFromWeight(NodeType node_type, int batch_size, int feat_idx) {
+    if(node_type != PAPER) {
+        std::cout << "Only support paper weighted sampling" << std::endl;
+    }
     std::vector<NodeID> mini_batch;
     mini_batch.reserve(batch_size);
     NodeList nodes = graph_->getNodes(node_type);
-    WeightList weights = graph_->getNodeWeights(node_type, PAPER_FEATURE, feat_idx); // FIXME: hard code
-    ITSSampling its_table(weights);
+    // WeightList weights = graph_->getNodeWeights(node_type, PAPER_FEATURE, feat_idx); // FIXME: hard code
+    // ITSSampling its_table(weights);
     for(int i = 0; i < batch_size; i++) {
-        mini_batch.push_back(its_table.sample());
+        if(use_alias_) {
+            mini_batch.push_back(alias_table_->sample());
+        } else {
+            mini_batch.push_back(its_table_->sample());
+        }
     }
     return mini_batch;
 }

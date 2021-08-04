@@ -16,7 +16,7 @@ enum class SamplingStrategy {
 
 class GraphEngine {
 public:
-    explicit GraphEngine(std::shared_ptr<Graph> graph);
+    explicit GraphEngine(std::shared_ptr<Graph> graph, bool use_alias);
     // used by 1st request type
     GraphMeta getGraphInfo();
     // used by 2nd & 3rd request type
@@ -32,7 +32,10 @@ public:
     // used by 7th request type
     std::vector<NodeID> randomWalk(NodeID root_node, EdgeType edge_type, int walk_len);
 private:
-    std::shared_ptr<Graph> graph_; 
+    std::shared_ptr<Graph> graph_;
+    bool use_alias_;
+    std::shared_ptr<ITSSampling> its_table_;
+    std::shared_ptr<ALIASSampling> alias_table_;
 };
 
 }
