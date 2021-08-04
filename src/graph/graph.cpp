@@ -28,7 +28,7 @@ Feature Graph::getFeatureData(NodeID node_id, FeatureType feat_type) {
     FeatureTypeMeta meta = this->getFeatureTypeMeta(feat_type);
     uint32_t feat_dim = meta.feature_dim;
     uint32_t feat_num = feature_data_[feat_type].size() / feat_dim;
-    std::cout << "feat_num:" << feat_num << std::endl;
+//    std::cout << "feat_num:" << feat_num << std::endl;
     uint32_t index = feature_map_[feat_type][node_id];
     if(feat_store_type == FeatureStorageType::COL_STORE) {
         result.data = feature_data_[feat_type].data() + index;
@@ -37,7 +37,7 @@ Feature Graph::getFeatureData(NodeID node_id, FeatureType feat_type) {
     } else {
         result.data = feature_data_[feat_type].data() + index * feat_dim;
         result.sz = feat_dim;
-        std::cout << "feat_dim:" << feat_dim << std::endl;
+//        std::cout << "feat_dim:" << feat_dim << std::endl;
         result.stride = 1;
     }
     return result;

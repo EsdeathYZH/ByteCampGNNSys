@@ -39,6 +39,7 @@ void ClientWithCache::SampleBatchNodes(const ByteGraph::NodeType &type, const in
                                        const ByteGraph::SampleStrategy::type &sampleStrategy,
                                        const int32_t &featureIndex,
                                        ByteGraph::BatchNodes &batchNodes) {
+    batchNodes.node_ids.clear();
     batchNodes.node_ids.reserve(batchSize);
     const auto size = rpc_clients_.size();
     std::vector<int64_t> servers_weight(size, 1);
@@ -71,14 +72,15 @@ void ClientWithCache::GetNodeFeature(const std::vector<ByteGraph::NodeId> &nodes
     for (const auto &notInCacheNode : notInCacheNodes) {
         rpc_clients_nodes[notInCacheNode % size].push_back(notInCacheNode);
     }
-    for (size_t i = 0; i < size; ++i) {
+    const auto rpc_clients_size = rpc_clients_.size();
+    for (size_t i = 0; i < rpc_clients_size; ++i) {
         NodesFeature notInCacheNodesFeature;
         rpc_clients_[i]->GetBatchNodeFeature(rpc_clients_nodes[i], featureType, notInCacheNodesFeature);
         auto tmpSize = rpc_clients_nodes[i].size();
         assert(tmpSize == notInCacheNodesFeature.size());
         for (size_t j = 0; j < tmpSize; ++j) {
             // put node feature in cache
-            cache_->PutNodeFeature(rpc_clients_nodes[i][j], nodesFeature[j]);
+            cache_->PutNodeFeature(rpc_clients_nodes[i][j], notInCacheNodesFeature[j]);
         }
     }
     nodesFeaturePtr = cache_->GetNodeFeature(nodes);
@@ -101,6 +103,7 @@ void ClientWithCache::GetNeighborsWithFeature(const ByteGraph::NodeId &nodeId, c
     }
     auto size = neighborNodes.size();
     // preallocate space
+    neighbors.clear();
     neighbors.reserve(size);
     NodesFeature neighborNodesFeature;
     GetNodeFeature(neighborNodes, featureType, neighborNodesFeature);

@@ -32,6 +32,7 @@ void ClientWithoutCache::SampleBatchNodes(const ByteGraph::NodeType &type, const
                                           const ByteGraph::SampleStrategy::type &sampleStrategy,
                                           const int32_t &featureIndex,
                                           ByteGraph::BatchNodes &batchNodes) {
+    batchNodes.node_ids.clear();
     batchNodes.node_ids.reserve(batchSize);
     const auto size = rpc_clients_.size();
     std::vector<int64_t> servers_weight(size, 1);

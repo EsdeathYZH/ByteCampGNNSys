@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
     // google::SetStderrLogging(google::INFO);
     FLAGS_logtostderr = true;
 
-    const std::string fileName = "/root/configs/servers.cfg";
+    const std::string fileName = "/root/configs/config.cfg";
     auto serverAddresses = ReadConfig<std::string, int>(fileName);
     std::vector<std::pair<string, int>> servers{serverAddresses};
     auto client = std::make_shared<ClientWithoutCache>(servers);
@@ -37,10 +37,12 @@ int main(int argc, char **argv) {
         LOG(INFO) << batchNodes.node_ids[i];
     }
     std::vector<NodeFeature> r;
-    client->GetNodeFeature({3}, 7, r);
+    client->GetNodeFeature(batchNodes.node_ids, 7, r);
     LOG(INFO) << "GetNodeFeature";
-    for(int i = 0 ; i < 4; i++) {
-        LOG(INFO) << ((float*)r[0].data())[i];
+    for(int i = 0 ; i < r.size(); i++) {
+        for (int j = 0; j < r[0].size(); ++j) {
+            LOG(INFO) << ((float*)r[i].data())[j];
+        }
     }
     // FeatureType featureType;
     // std::vector<IDFeaturePair> neighbors;
