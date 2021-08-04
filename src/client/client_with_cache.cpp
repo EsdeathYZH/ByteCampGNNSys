@@ -28,7 +28,7 @@ ClientWithCache::ClientWithCache(const std::vector<std::pair<std::string, int>> 
 
 void ClientWithCache::CacheWarmUp() {
     LOG(INFO) << "Cache Warmup start";
-    const size_t up = 1e8, batch = 102400;
+    const size_t up = 3e7, batch = 102400;
     size_t cnt = 1e7;
     while (cnt < up) {
         std::vector<NodeId> nodes(batch);
@@ -42,10 +42,10 @@ void ClientWithCache::CacheWarmUp() {
             rpc_clients_nodes[notInCacheNode % 3].push_back(notInCacheNode);
         }
         for (size_t i = 0; i < rpc_clients_size; ++i) {
-            NodesFeature notInCacheNodesFeature;
-            rpc_clients_[i]->GetBatchNodeFeature(rpc_clients_nodes[i], 7, notInCacheNodesFeature);
             auto tmpSize = rpc_clients_nodes[i].size();
-            assert(tmpSize == notInCacheNodesFeature.size());
+            NodesFeature notInCacheNodesFeature(tmpSize);
+//            rpc_clients_[i]->GetBatchNodeFeature(rpc_clients_nodes[i], 7, notInCacheNodesFeature);
+//            assert(tmpSize == notInCacheNodesFeature.size());
             for (size_t j = 0; j < tmpSize; ++j) {
                 // put node feature in cache
                 cache_->PutNodeFeature(rpc_clients_nodes[i][j], notInCacheNodesFeature[j]);

@@ -36,7 +36,7 @@ Feature Graph::getFeatureData(NodeID node_id, FeatureType feat_type) {
         result.stride = feat_num;
     } else {
         result.data = feature_data_[feat_type].data() + index * feat_dim;
-        result.sz = 1;
+        result.sz = feat_dim;
 //        std::cout << "feat_dim:" << feat_dim << std::endl;
         result.stride = 1;
     }

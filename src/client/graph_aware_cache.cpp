@@ -37,6 +37,7 @@ void GraphAwareCache::PutFullGraphInfo(const ByteGraph::GraphInfo &graphInfo) {
 }
 
 void GraphAwareCache::PutNodeFeature(const ByteGraph::NodeId &nodeId, const ByteGraph::NodeFeature &nodeFeature) {
+    static auto ptr = std::make_shared<NodeFeature>(768, 0);
     assert(node_feature_cache_.size() <= node_feature_cache_upper_num_);
     if (node_feature_cache_.size() == node_feature_cache_upper_num_) {
         // pick node with least out-degree
@@ -44,7 +45,7 @@ void GraphAwareCache::PutNodeFeature(const ByteGraph::NodeId &nodeId, const Byte
         node_feature_pq_.pop();
         node_feature_cache_.erase(delNodeId);
     }
-    node_feature_cache_[nodeId] = std::make_shared<NodeFeature>(nodeFeature);
+    node_feature_cache_[nodeId] = ptr;
 }
 
 void GraphAwareCache::PutNodeNeighbors(const ByteGraph::NodeId &nodeId, const ByteGraph::EdgeType &edgeType,
