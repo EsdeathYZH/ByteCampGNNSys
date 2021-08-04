@@ -23,6 +23,37 @@ ClientWithCache::ClientWithCache(const std::vector<std::pair<std::string, int>> 
         rpc_clients_.emplace_back(rpc_client);
     }
     assert(rpc_clients_.size() == serverAddresses.size());
+    CacheWarmUp();
+}
+
+void ClientWithCache::CacheWarmUp() {
+    LOG(INFO) << "Cache Warmup start";
+    const size_t up = 1e8, batch = 102400;
+    size_t cnt = 1e7;
+    while (cnt < up) {
+        std::vector<NodeId> nodes(batch);
+        for (NodeId i = cnt; i < cnt+batch; ++i) {
+            nodes[i-cnt] = i;
+        }
+        const auto size = nodes.size();
+        const auto rpc_clients_size = rpc_clients_.size();
+        std::vector<std::vector<NodeId>> rpc_clients_nodes(3);
+        for (const auto &notInCacheNode : nodes) {
+            rpc_clients_nodes[notInCacheNode % 3].push_back(notInCacheNode);
+        }
+        for (size_t i = 0; i < rpc_clients_size; ++i) {
+            NodesFeature notInCacheNodesFeature;
+            rpc_clients_[i]->GetBatchNodeFeature(rpc_clients_nodes[i], 7, notInCacheNodesFeature);
+            auto tmpSize = rpc_clients_nodes[i].size();
+            assert(tmpSize == notInCacheNodesFeature.size());
+            for (size_t j = 0; j < tmpSize; ++j) {
+                // put node feature in cache
+                cache_->PutNodeFeature(rpc_clients_nodes[i][j], notInCacheNodesFeature[j]);
+            }
+        }
+        cnt += batch;
+    }
+    LOG(INFO) << "client cache warmup end";
 }
 
 void ClientWithCache::GetFullGraphInfo(ByteGraph::GraphInfo &graphInfo) {
@@ -59,6 +90,7 @@ void ClientWithCache::SampleBatchNodes(const ByteGraph::NodeType &type, const in
 
 void ClientWithCache::GetNodeFeature(const std::vector<ByteGraph::NodeId> &nodes,
                                      const ByteGraph::FeatureType &featureType, ByteGraph::NodesFeature &nodesFeature) {
+    int cnt = 0;
     auto nodesFeaturePtr = cache_->GetNodeFeature(nodes);
     const auto size = nodes.size();
     std::vector<NodeId> notInCacheNodes;
@@ -66,13 +98,16 @@ void ClientWithCache::GetNodeFeature(const std::vector<ByteGraph::NodeId> &nodes
     for (size_t i = 0; i < size; ++i) {
         if (nodesFeaturePtr[i] == nullptr) {
             notInCacheNodes.push_back(nodes[i]);
+        } else {
+            ++cnt;
         }
     }
-    std::vector<std::vector<NodeId>> rpc_clients_nodes(size);
-    for (const auto &notInCacheNode : notInCacheNodes) {
-        rpc_clients_nodes[notInCacheNode % size].push_back(notInCacheNode);
-    }
+    LOG(INFO) << "cache hit:" << cnt << " times in " << nodes.size() << "total times";
     const auto rpc_clients_size = rpc_clients_.size();
+    std::vector<std::vector<NodeId>> rpc_clients_nodes(rpc_clients_size);
+    for (const auto &notInCacheNode : notInCacheNodes) {
+        rpc_clients_nodes[notInCacheNode % rpc_clients_size].push_back(notInCacheNode);
+    }
     for (size_t i = 0; i < rpc_clients_size; ++i) {
         NodesFeature notInCacheNodesFeature;
         rpc_clients_[i]->GetBatchNodeFeature(rpc_clients_nodes[i], featureType, notInCacheNodesFeature);

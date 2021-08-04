@@ -38,6 +38,9 @@ class ClientWithCache : public ClientBase {
                     std::vector<std::vector<ByteGraph::NodeId>>& nodes) override;
 
    private:
+    void CacheWarmUp();
+
+   private:
     std::vector<std::shared_ptr<RpcClient>> rpc_clients_;
     std::vector<std::vector<int64_t>> server_weights_;
     std::shared_ptr<Cache> cache_;
