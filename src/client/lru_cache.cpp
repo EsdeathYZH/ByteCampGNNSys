@@ -1,12 +1,19 @@
 #include "lru_cache.h"
 
-#include <vector>
-
 #include <glog/logging.h>
+
+#include <vector>
 
 using namespace ByteGraph;
 
 namespace ByteCamp {
+
+LRUCache::~LRUCache() {
+    LOG(INFO) << "cache nf_total cnt:" << nf_total_count_ << " nf_hit cnt:" << nf_hit_count_
+              << " nf_hit_rate:" << (double) nf_hit_count_ / (double) nf_total_count_;
+    LOG(INFO) << "cache nn_total cnt:" << nn_total_count_ << " nn_hit cnt:" << nn_hit_count_
+              << " nn_hit_rate:" << (double) nn_hit_count_ / (double) nn_total_count_;
+}
 
 std::shared_ptr<ByteGraph::GraphInfo> LRUCache::GetFullGraphInfo() { return graph_info_; }
 
@@ -22,9 +29,11 @@ std::vector<std::shared_ptr<ByteGraph::NodeFeature>> LRUCache::GetNodeFeature(
 
 std::shared_ptr<ByteGraph::Neighbor> LRUCache::GetNeighbors(const ByteGraph::NodeId &nodeId,
                                                             const ByteGraph::EdgeType &edgeType) {
+    ++nn_total_count_;
     if (!node_neighbors_cache_.count(nodeId) || !node_neighbors_cache_[nodeId].count(edgeType)) {
         return nullptr;
     }
+    ++nn_hit_count_;
     TouchNodeNeighbors(nodeId);
     return node_neighbors_cache_[nodeId][edgeType];
 }
@@ -78,9 +87,11 @@ void LRUCache::DelNodeNeighbors(const ByteGraph::NodeId &nodeId, const ByteGraph
 }
 
 std::shared_ptr<ByteGraph::NodeFeature> LRUCache::GetSingleNodeFeature(const ByteGraph::NodeId &nodeId) {
+    ++nf_total_count_;
     if (!node_feature_cache_.count(nodeId)) {
         return nullptr;
     }
+    ++nf_hit_count_;
     TouchNodeFeature(nodeId);
     return node_feature_cache_[nodeId].first;
 }
@@ -103,4 +114,4 @@ std::shared_ptr<Cache> NewLRUCache(size_t capacity) {
     return std::static_pointer_cast<Cache>(std::make_shared<LRUCache>(capacity));
 }
 
-} // namespace ByteCamp
+}  // namespace ByteCamp

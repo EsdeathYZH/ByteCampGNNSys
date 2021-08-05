@@ -22,6 +22,8 @@ class LRUCache : public Cache {
         , node_feature_cache_upper_num_(capacity_ / NODE_FEATURE_CACHE_SPLIT)
         , node_neighbors_cache_upper_num_(capacity_ / NODE_NEIGHBORS_CACHE_SPLIT) {}
 
+    ~LRUCache();
+
     std::shared_ptr<ByteGraph::GraphInfo> GetFullGraphInfo() override;
 
     std::vector<std::shared_ptr<ByteGraph::NodeFeature>> GetNodeFeature(
@@ -52,6 +54,10 @@ class LRUCache : public Cache {
 
    private:
     std::shared_ptr<ByteGraph::GraphInfo> graph_info_;
+    int64_t nf_hit_count_{0};
+    int64_t nf_total_count_{0};
+    int64_t nn_hit_count_{0};
+    int64_t nn_total_count_{0};
     const size_t capacity_;
 
     const size_t node_feature_cache_upper_num_;

@@ -1,9 +1,17 @@
 #include "simple_cache.h"
+
 #include <glog/logging.h>
 
 using namespace ByteGraph;
 
 namespace ByteCamp {
+
+SimpleCache::~SimpleCache() {
+    LOG(INFO) << "cache nf_total cnt:" << nf_total_count_ << " nf_hit cnt:" << nf_hit_count_
+              << " nf_hit_rate:" << (double) nf_hit_count_ / (double) nf_total_count_;
+    LOG(INFO) << "cache nn_total cnt:" << nn_total_count_ << " nn_hit cnt:" << nn_hit_count_
+              << " nn_hit_rate:" << (double) nn_hit_count_ / (double) nn_total_count_;
+}
 
 std::shared_ptr<ByteGraph::GraphInfo> SimpleCache::GetFullGraphInfo() { return graph_info_; }
 
@@ -12,9 +20,11 @@ std::vector<std::shared_ptr<ByteGraph::NodeFeature>> SimpleCache::GetNodeFeature
     std::vector<std::shared_ptr<NodeFeature>> ans;
     ans.reserve(nodeIds.size());
     for (const auto &nodeId : nodeIds) {
+        ++nf_total_count_;
         if (!node_feature_cache_.count(nodeId)) {
             ans.push_back(nullptr);
         } else {
+            ++nf_hit_count_;
             ans.push_back(node_feature_cache_[nodeId]);
         }
     }
@@ -23,9 +33,11 @@ std::vector<std::shared_ptr<ByteGraph::NodeFeature>> SimpleCache::GetNodeFeature
 
 std::shared_ptr<ByteGraph::Neighbor> SimpleCache::GetNeighbors(const ByteGraph::NodeId &nodeId,
                                                                const ByteGraph::EdgeType &edgeType) {
+    ++nn_total_count_;
     if (!node_neighbors_cache_.count(nodeId) || !node_neighbors_cache_[nodeId].count(edgeType)) {
         return nullptr;
     }
+    ++nn_hit_count_;
     return node_neighbors_cache_[nodeId][edgeType];
 }
 
@@ -68,4 +80,4 @@ std::shared_ptr<Cache> NewSimpleCache(size_t capacity) {
     return std::static_pointer_cast<Cache>(std::make_shared<SimpleCache>(capacity));
 }
 
-} // namespace ByteCamp
+}  // namespace ByteCamp

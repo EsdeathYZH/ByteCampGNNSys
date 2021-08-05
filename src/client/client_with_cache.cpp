@@ -28,7 +28,7 @@ ClientWithCache::ClientWithCache(const std::vector<std::pair<std::string, int>> 
 
 void ClientWithCache::CacheWarmUp() {
     LOG(INFO) << "Cache Warmup start";
-    const size_t up = 3e7, batch = 102400;
+    const size_t up = 1e8, batch = 102400;
     size_t cnt = 1e7;
     while (cnt < up) {
         std::vector<NodeId> nodes(batch);
@@ -90,6 +90,7 @@ void ClientWithCache::SampleBatchNodes(const ByteGraph::NodeType &type, const in
 
 void ClientWithCache::GetNodeFeature(const std::vector<ByteGraph::NodeId> &nodes,
                                      const ByteGraph::FeatureType &featureType, ByteGraph::NodesFeature &nodesFeature) {
+    static NodeFeature defaultNodesFeature(768, 0);
     int cnt = 0;
     auto nodesFeaturePtr = cache_->GetNodeFeature(nodes);
     const auto size = nodes.size();
@@ -121,6 +122,9 @@ void ClientWithCache::GetNodeFeature(const std::vector<ByteGraph::NodeId> &nodes
     nodesFeature.clear();
     nodesFeature.reserve(size);
     for (size_t i = 0; i < size; ++i) {
+        if (nodesFeaturePtr[i] == nullptr)
+            nodesFeature.push_back(defaultNodesFeature);
+        else
         nodesFeature.push_back(*nodesFeaturePtr[i]);
     }
 }
