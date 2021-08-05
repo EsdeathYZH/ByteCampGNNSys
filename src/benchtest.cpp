@@ -92,13 +92,20 @@ void test_SampleBatchNodesAndGetNodeFeature(const std::vector<std::pair<string, 
 void test_GetNeighborsWithFeature(const std::vector<std::pair<string, int>>& servers, const NodeId& NODE_ID_MAX,
                                   const EdgeType& NEIGHBOR_TYPE_MAX, const FeatureType& FEATURE_TYPE_MAX) {
     // auto client = std::make_shared<ClientWithoutCache>(servers);
-    auto simpleCache = NewLRUCache(100 * (1ll << 30));
-    // auto simpleCache = NewSimpleCache(100 * (1ll << 30));
-
-    // auto inDegree = ReadInDegree("/data/sortedByIndegree_vertex_table.txt");
-    // LOG(INFO) << "ReadInDegree over!";
-    // auto simpleCache = NewGraphAwareCache(
-    //     100 * (1ll << 30), [&inDegree](NodeId x, NodeId y) -> bool { return inDegree[x] > inDegree[y]; });
+    std::shared_ptr<ByteCamp::Cache> simpleCache;
+    std::unordered_map<ByteGraph::NodeId, int32_t> inDegree;
+    if (NEIGHBOR_TYPE_MAX == 1) {
+        simpleCache = NewSimpleCache(100 * (1ll << 30));
+        LOG(INFO) << "NewSimpleCache over!";
+    } else if (NEIGHBOR_TYPE_MAX == 2) {
+        simpleCache = NewLRUCache(100 * (1ll << 30));
+        LOG(INFO) << "NewLRUCache over!";
+    } else if (NEIGHBOR_TYPE_MAX == 3) {
+        inDegree = ReadInDegree("/data/sortedByIndegree_vertex_table.txt");
+        LOG(INFO) << "ReadInDegree over!";
+        simpleCache = NewGraphAwareCache(100 * (1ll << 30),
+                                         [&inDegree](NodeId x, NodeId y) -> bool { return inDegree[x] > inDegree[y]; });
+    }
 
     auto client = std::make_shared<ClientWithCache>(servers, simpleCache);
 
@@ -110,7 +117,7 @@ void test_GetNeighborsWithFeature(const std::vector<std::pair<string, int>>& ser
     int64_t start_t = get_wall_time();
 
     for (FeatureType feature_type = 0; feature_type < FEATURE_TYPE_MAX; feature_type++) {
-        for (EdgeType edge_type = 0; edge_type < NEIGHBOR_TYPE_MAX; edge_type++) {
+        for (EdgeType edge_type = 0; edge_type < 1; edge_type++) {
             for (size_t index = 0; index < NODE_ID_MAX; index++) {
                 client->GetNeighborsWithFeature(batchNodes.node_ids[index], 4, 7, neighbors);
             }
@@ -119,16 +126,16 @@ void test_GetNeighborsWithFeature(const std::vector<std::pair<string, int>>& ser
 
     int64_t end_t = get_wall_time();
 
-    fprintf(stderr, "pure %lld times cost = %f ms, qps = %f\n", NODE_ID_MAX * NEIGHBOR_TYPE_MAX * FEATURE_TYPE_MAX,
-            (end_t - start_t) / 1000.0, NODE_ID_MAX * NEIGHBOR_TYPE_MAX * FEATURE_TYPE_MAX * 1000000.0 / (end_t - start_t));
+    printf("type %lld: pure %lld times cost = %f ms, qps = %f\n", NEIGHBOR_TYPE_MAX, NODE_ID_MAX * FEATURE_TYPE_MAX,
+            (end_t - start_t) / 1000.0, NODE_ID_MAX * FEATURE_TYPE_MAX * 1000000.0 / (end_t - start_t));
 }
 
 int main(int argc, char** argv) {
     // Initialize Google’s logging library.
     google::InitGoogleLogging(argv[0]);
-    google::SetLogDestination(google::INFO, "/tmp/log/INFO_");
-    // google::SetStderrLogging(google::INFO);
-    FLAGS_logtostderr = true;
+    // google::SetLogDestination(google::INFO, "/tmp/log/INFO_");
+    // google::SetStderrLogging(google::WARNING);
+    // FLAGS_logtostderr = true;
 
     if (argc < 4) {
         printf("Usage: benchtest <server_list> <thread_nums> <retry_times> [optional: <node_id> <neighbor_type> <feature_type>]\n");
@@ -180,7 +187,7 @@ int main(int argc, char** argv) {
     thrs.reserve(thr_num);
 
     int64_t start_t = get_wall_time();
-    printf("benchtest start\n");
+    // printf("benchtest start\n");
 
     for (int i = 0; i < thr_num; ++i) {
         thrs.emplace_back(
@@ -192,11 +199,11 @@ int main(int argc, char** argv) {
         th.join();
     }
 
-    printf("benchtest end\n");
+    // printf("benchtest end\n");
     int64_t end_t = get_wall_time();
 
-    fprintf(stderr, "test_SampleBatchNodesAndGetNodeFeature %lld times cost = %f ms, qps = %f\n", retry_times,
-            (end_t - start_t) / 1000.0, retry_times * 1000000.0 / (end_t - start_t));
+    // fprintf(stderr, "test_SampleBatchNodesAndGetNodeFeature %lld times cost = %f ms, qps = %f\n", retry_times,
+    //         (end_t - start_t) / 1000.0, retry_times * 1000000.0 / (end_t - start_t));
 
     // start_t = get_wall_time();
     // printf("benchtest start\n");
